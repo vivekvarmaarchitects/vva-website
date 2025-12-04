@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${generalSans.variable} ${outfit.variable} font-sans antialiased`}
+        className={`${generalSans.className} ${outfit.variable} antialiased`}
       >
         <ThemeProvider attribute="class" enableSystem defaultTheme="system">
           <div className="min-h-screen flex flex-col">
