@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+
+import { outfit, generalSans } from "@/public/fonts/fonts";
+
+import { ThemeProvider } from "next-themes";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -16,8 +19,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider>
+      <body
+        className={`${generalSans.variable} ${outfit.variable} font-sans antialiased`}
+      >
+        <ThemeProvider attribute="class" enableSystem defaultTheme="system">
           <div className="min-h-screen flex flex-col">
             <SiteHeader />
             <main className="flex-1">{children}</main>
