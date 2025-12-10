@@ -18,7 +18,7 @@ function Logo() {
     mounted && resolvedTheme === "dark" ? "/vva-white.svg" : "/vva-black.svg";
 
   return (
-    <Link href="/" className="flex items-center gap-2">
+    <Link href="/home" className="flex items-center gap-2">
       <Image src={logoSrc} alt="VVA logo" width={80} height={24} priority />
     </Link>
   );
@@ -29,9 +29,7 @@ export function SiteHeader() {
     <header className="w-full bg-white dark:bg-black transition-all duration-300 font-sans">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 md:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <Logo />
-        </Link>
+        <Logo />
 
         {/* Right side: nav + theme toggle + CTA */}
         <div className="flex items-center gap-6">
