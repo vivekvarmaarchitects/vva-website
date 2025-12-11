@@ -44,7 +44,7 @@ const ProjectBlock = ({
     isDesktop && metaPositionLg ? metaPositionLg : metaPosition;
 
   const metaBlock = (
-    <div className="text-xs uppercase tracking-[0.2em] dark:text-neutral-200 space-y-1">
+    <div className="text-base md:text-xs uppercase tracking-wide md:tracking-[0.2em] dark:text-neutral-200 space-y-1">
       <p>{title}</p>
       <p>{client}</p>
       <p>{year}</p>
@@ -93,7 +93,7 @@ export default function HomePage() {
         className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full
 "
       >
-        <div className="sm:flex horizontal block space-between gap-5  max-w-[1440px] mx-auto px-4 md:px-8 py-5">
+        <div className="md:flex horizontal block space-between gap-5  width-max py-5">
           <SplitText
             text="Crafting spatial narratives grounded in human experience"
             className="flex font-sans text-5xl font-regular"
@@ -116,7 +116,7 @@ export default function HomePage() {
               markers: false,
             }}
           />
-          <h2 className="flex font-display sm:w-[50%]">
+          <h2 className="flex font-display md:w-[50%]">
             We, Vivek Varma Architects, are a practice rooted in interior
             architecture, shaping environments for those who value design,
             craft, and context.
@@ -133,10 +133,12 @@ export default function HomePage() {
             />
           </div>
         </div>
-        <div className="w-full mx-auto px-4 md:px-8 py-5 text-center text-lg font-sans border-b-2 border-color-[#666766] text-[#666766] dark:text-[#B3B4B4] dark:border-color-[#B3B4B4]">
-          <p>Our Raison d'être</p>
+        <div className="w-full width-max py-5 text-center border-b-2 border-color-[#666766] common-heading dark:border-color-[#B3B4B4]">
+          <p>
+            Our <span className="italic">Raison d'être</span>
+          </p>
         </div>
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8">
+        <div className="width-max">
           <SplitText
             text="Our work explores the relationship between light, material,
         proportion, and movement. We approach every interior as a dialogue
@@ -164,11 +166,13 @@ export default function HomePage() {
             }}
           />
         </div>
-        <p className="mx-auto max-w-[1440] px-4 md:px-8">FEATURED PROJECTS</p>
+        <p className="width-max common-heading mb-10 md:my-12 text-center md:text-left">
+          FEATURED <span className="italic">PROJECTS</span>
+        </p>
         <main className="min-h-screen dark:bg-black text-black dark:text-white">
-          <section className="mx-auto max-w-[1440] px-4 lg:py-8 md:px-8">
+          <section className="width-max pb-20">
             {/* Projects grid */}
-            <div className="grid grid-cols-1 gap-x-8 lg:grid-cols-8 mt-12">
+            <div className="grid grid-cols-1 gap-x-8 lg:grid-cols-8">
               {/* Top left */}
               <FadeIn
                 distance={0}
@@ -220,7 +224,7 @@ export default function HomePage() {
                     year="2023"
                     imageSrc="/1.png"
                     align="right"
-                    className=" mt-20"
+                    className="mt-10 lg:mt-0"
                     metaPosition="bottom"
                     metaPositionLg="bottom"
                   />
@@ -249,7 +253,7 @@ export default function HomePage() {
                     year="2022"
                     imageSrc="/3.png"
                     align="left"
-                    className="lg:col-span-6 lg:col-start-3 lg:mt-20"
+                    className="lg:col-span-6 lg:col-start-3 mt-10 lg:mt-20"
                     metaPositionLg="left"
                     metaPosition="bottom"
                   />
@@ -268,7 +272,7 @@ export default function HomePage() {
                 scale={0.5}
                 threshold={0}
                 delay={0.2}
-                className="w-full lg:col-span-3 mt-35"
+                className="w-full lg:col-span-3 "
               >
                 <div className="sticky top-100">
                   {" "}
@@ -278,7 +282,7 @@ export default function HomePage() {
                     year="2021"
                     imageSrc="/4.png"
                     align="right"
-                    className="lg:col-span-4 lg:col-start-9 lg:mt-20"
+                    className="lg:col-span-4 lg:col-start-9 mt-10 lg:mt-45"
                     metaPositionLg="bottom"
                     metaPosition="bottom"
                   />
@@ -307,7 +311,7 @@ export default function HomePage() {
                     year="2020"
                     imageSrc="/5.png"
                     align="left"
-                    className="lg:col-span-5 lg:mt-20"
+                    className="lg:col-span-5 mt-10 lg:mt-20"
                     metaPositionLg="right"
                     metaPosition="bottom"
                   />
@@ -317,181 +321,329 @@ export default function HomePage() {
           </section>
         </main>
         <section className="bg-black text-white">
-          <div className="mx-auto max-w-[1440] px-4 py-8 md:px-8">
+          <div className="width-max py-8">
             {/* Heading */}
-            <h2 className="mb-12 text-center text-xs font-medium tracking-[0.4em] text-neutral-400">
+            <p className="mb-12 text-center font-[#C3C3C3] common-heading ">
               RESULTS THAT <span className="italic">MATCH YOUR VISION</span>
-            </h2>
+            </p>
 
             <div className="overflow-x-auto">
-              <table className="w-full border border-neutral-700 text-left min-w-[900px]">
-                <tbody>
-                  <tr className="border-b border-neutral-700">
-                    {/* <!-- 30+ --> */}
-                    <td className="p-8 align-top border border-neutral-700">
-                      <CountUp
-                        from={0}
-                        to={30}
-                        separator=","
-                        direction="up"
-                        duration={1}
-                        className="text-4xl font-light"
-                      />
-                      <span className="text-4xl font-light">+</span>
-                      <p className="mt-4 text-sm text-neutral-300">
-                        Years of practice
-                      </p>
-                    </td>
+              <div className="hidden lg:block">
+                <table className="w-full border border-neutral-700 text-left min-w-[600px]">
+                  <tbody>
+                    <tr className="border-b border-neutral-700">
+                      {/* <!-- 30+ --> */}
+                      <td className="p-8 align-top border border-neutral-700">
+                        <CountUp
+                          from={0}
+                          to={30}
+                          separator=","
+                          direction="up"
+                          duration={1}
+                          className="text-4xl font-light"
+                        />
+                        <span className="text-4xl font-light">+</span>
+                        <p className="mt-4 text-sm text-neutral-300">
+                          Years of practice
+                        </p>
+                      </td>
 
-                    {/* <!-- 700+ --> */}
-                    <td className="p-8 align-top border border-neutral-700">
-                      <CountUp
-                        from={0}
-                        to={700}
-                        separator=","
-                        direction="up"
-                        duration={1}
-                        className="text-4xl font-light"
-                      />
-                      <span className="text-4xl font-light">+</span>
-                      <p className="mt-4 text-sm text-neutral-300">
-                        Completed environments
-                      </p>
-                    </td>
+                      {/* <!-- 700+ --> */}
+                      <td className="p-8 align-top border border-neutral-700">
+                        <CountUp
+                          from={0}
+                          to={700}
+                          separator=","
+                          direction="up"
+                          duration={1}
+                          className="text-4xl font-light"
+                        />
+                        <span className="text-4xl font-light">+</span>
+                        <p className="mt-4 text-sm text-neutral-300">
+                          Completed environments
+                        </p>
+                      </td>
 
-                    {/* Testimonial (spans 2 columns) */}
-                    <td colSpan={3} className="p-8 align-top w-full min-w-sm">
-                      <div className="flex flex-col justify-between min-h-[120px]">
-                        {/* Top text */}
-                        <div>
-                          <p className="text-sm text-neutral-200 leading-relaxed">
-                            Lorem Ipsum is simply dummy text of the printing and
-                            typesetting industry. Lorem Ipsum has been the
-                            industry's standard dummy text ever since the 1500s.
-                          </p>
-                        </div>
-
-                        {/* Bottom block (Sohil + Logo) */}
-                        <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                      {/* Testimonial (spans 2 columns) */}
+                      <td colSpan={3} className="p-8 align-top w-full min-w-sm">
+                        <div className="flex flex-col justify-between min-h-[120px]">
+                          {/* Top text */}
                           <div>
-                            <p className="font-medium">Sohil Shriyan</p>
-                            <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
-                              Marketing Head
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              Lorem Ipsum is simply dummy text of the printing
+                              and typesetting industry. Lorem Ipsum has been the
+                              industry's standard dummy text ever since the
+                              1500s.
                             </p>
                           </div>
 
-                          <span className="tracking-[0.3em] uppercase">
-                            LOGO
-                          </span>
+                          {/* Bottom block (Sohil + Logo) */}
+                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                            <div>
+                              <p className="font-medium">Sohil Shriyan</p>
+                              <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                                Marketing Head
+                              </p>
+                            </div>
+
+                            <span className="tracking-[0.3em] uppercase">
+                              LOGO
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* <!-- 41 --> */}
-                    <td className="p-8 align-top border border-neutral-700">
-                      <CountUp
-                        from={0}
-                        to={41}
-                        separator=","
-                        direction="up"
-                        duration={1}
-                        className="text-4xl font-light"
-                      />
+                      {/* <!-- 41 --> */}
+                      <td className="p-8 align-top border border-neutral-700">
+                        <CountUp
+                          from={0}
+                          to={41}
+                          separator=","
+                          direction="up"
+                          duration={1}
+                          className="text-4xl font-light"
+                        />
 
-                      <p className="mt-4 text-sm text-neutral-300">
-                        Lorem Ipsum
-                      </p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <table className="w-full border border-neutral-700 text-left min-w-[900px]">
-                <tbody>
-                  {/* <!-- Bottom row --> */}
-                  <tr>
-                    {/* Testimonial (spans 3 columns) */}
-                    <td colSpan={2} className="p-8 align-top w-full">
-                      <div className="flex flex-col justify-between min-h-[120px]">
-                        {/* Top text */}
-                        <div>
-                          <p className="text-sm text-neutral-200 leading-relaxed">
-                            Lorem Ipsum is simply dummy text of the printing and
-                            typesetting industry. Lorem Ipsum has been the
-                            industry's standard dummy text ever since the 1500s.
-                          </p>
-                        </div>
-
-                        {/* Bottom block (Sohil + Logo) */}
-                        <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                        <p className="mt-4 text-sm text-neutral-300">
+                          Lorem Ipsum
+                        </p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table className="w-full border border-neutral-700 text-left min-w-[600px]">
+                  <tbody>
+                    {/* <!-- Bottom row --> */}
+                    <tr>
+                      {/* Testimonial (spans 3 columns) */}
+                      <td colSpan={2} className="p-8 align-top w-full">
+                        <div className="flex flex-col justify-between min-h-[120px]">
+                          {/* Top text */}
                           <div>
-                            <p className="font-medium">Sohil Shriyan</p>
-                            <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
-                              Marketing Head
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              Lorem Ipsum is simply dummy text of the printing
+                              and typesetting industry. Lorem Ipsum has been the
+                              industry's standard dummy text ever since the
+                              1500s.
                             </p>
                           </div>
 
-                          <span className="tracking-[0.3em] uppercase">
-                            LOGO
-                          </span>
+                          {/* Bottom block (Sohil + Logo) */}
+                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                            <div>
+                              <p className="font-medium">Sohil Shriyan</p>
+                              <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                                Marketing Head
+                              </p>
+                            </div>
+
+                            <span className="tracking-[0.3em] uppercase">
+                              LOGO
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* <!-- 200+ --> */}
-                    <td
-                      colSpan={1}
-                      className="p-8 align-top border border-neutral-700"
-                    >
-                      <CountUp
-                        from={100}
-                        to={200}
-                        separator=","
-                        direction="up"
-                        duration={1}
-                        className="text-4xl font-light"
-                      />
-                      <span className="text-4xl font-light">+</span>
-                      <p className="mt-4 text-sm text-neutral-300">
-                        Clients <br /> across India
-                      </p>
-                    </td>
+                      {/* <!-- 200+ --> */}
+                      <td
+                        colSpan={1}
+                        className="p-8 align-top border border-neutral-700"
+                      >
+                        <CountUp
+                          from={100}
+                          to={200}
+                          separator=","
+                          direction="up"
+                          duration={1}
+                          className="text-4xl font-light"
+                        />
+                        <span className="text-4xl font-light">+</span>
+                        <p className="mt-4 text-sm text-neutral-300">
+                          Clients <br /> across India
+                        </p>
+                      </td>
 
-                    {/* Testimonial (spans 2 columns) */}
-                    <td colSpan={3} className="p-8 align-top w-full min-w-sm">
-                      <div className="flex flex-col justify-between min-h-[120px]">
-                        {/* Top text */}
-                        <div>
-                          <p className="text-sm text-neutral-200 leading-relaxed">
-                            Lorem Ipsum is simply dummy text of the printing and
-                            typesetting industry. Lorem Ipsum has been the
-                            industry's standard dummy text ever since the 1500s.
-                          </p>
-                        </div>
-
-                        {/* Bottom block (Sohil + Logo) */}
-                        <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                      {/* Testimonial (spans 2 columns) */}
+                      <td colSpan={3} className="p-8 align-top w-full min-w-sm">
+                        <div className="flex flex-col justify-between min-h-[120px]">
+                          {/* Top text */}
                           <div>
-                            <p className="font-medium">Sohil Shriyan</p>
-                            <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
-                              Marketing Head
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              Lorem Ipsum is simply dummy text of the printing
+                              and typesetting industry. Lorem Ipsum has been the
+                              industry's standard dummy text ever since the
+                              1500s.
                             </p>
                           </div>
 
-                          <span className="tracking-[0.3em] uppercase">
-                            LOGO
-                          </span>
+                          {/* Bottom block (Sohil + Logo) */}
+                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                            <div>
+                              <p className="font-medium">Sohil Shriyan</p>
+                              <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                                Marketing Head
+                              </p>
+                            </div>
+
+                            <span className="tracking-[0.3em] uppercase">
+                              LOGO
+                            </span>
+                          </div>
                         </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {/* Mobile div */}
+              <div className="block lg:hidden">
+                {/* STATS GRID (replaces first table) */}
+                <div className="grid grid-cols-2 border border-neutral-700">
+                  {/* 30+ */}
+                  <div className="p-8 border-b border-neutral-700 border-r">
+                    <CountUp
+                      from={0}
+                      to={30}
+                      separator=","
+                      direction="up"
+                      duration={1}
+                      className="text-4xl font-light"
+                    />
+                    <span className="text-4xl font-light">+</span>
+                    <p className="mt-4 text-sm text-neutral-300">
+                      Years of practice
+                    </p>
+                  </div>
+
+                  {/* 700+ */}
+                  <div className="p-8 border-b border-neutral-700">
+                    <CountUp
+                      from={0}
+                      to={700}
+                      separator=","
+                      direction="up"
+                      duration={1}
+                      className="text-4xl font-light"
+                    />
+                    <span className="text-4xl font-light">+</span>
+                    <p className="mt-4 text-sm text-neutral-300">
+                      Completed environments
+                    </p>
+                  </div>
+
+                  {/* 41 */}
+                  <div className="p-8  border-neutral-700 border-r">
+                    <CountUp
+                      from={0}
+                      to={41}
+                      separator=","
+                      direction="up"
+                      duration={1}
+                      className="text-4xl font-light"
+                    />
+                    <p className="mt-4 text-sm text-neutral-300">Lorem Ipsum</p>
+                  </div>
+
+                  {/* 200+ */}
+                  <div className="p-8">
+                    <CountUp
+                      from={100}
+                      to={200}
+                      separator=","
+                      direction="up"
+                      duration={1}
+                      className="text-4xl font-light"
+                    />
+                    <span className="text-4xl font-light">+</span>
+                    <p className="mt-4 text-sm text-neutral-300">
+                      Clients <br /> across India
+                    </p>
+                  </div>
+                </div>
+
+                {/* TESTIMONIAL STACK (replaces second table) */}
+                <div className="border border-neutral-700 divide-y divide-neutral-700">
+                  {/* Row 1 */}
+                  <div className="p-8">
+                    <div className="flex flex-col justify-between min-h-[120px]">
+                      {/* Top text */}
+                      <div>
+                        <p className="text-sm text-neutral-200 leading-relaxed">
+                          Lorem Ipsum is simply dummy text of the printing and
+                          typesetting industry. Lorem Ipsum has been the
+                          industry's standard dummy text ever since the 1500s.
+                        </p>
                       </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+
+                      {/* Bottom block (Sohil + Logo) */}
+                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                        <div>
+                          <p className="font-medium">Sohil Shriyan</p>
+                          <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                            Marketing Head
+                          </p>
+                        </div>
+
+                        <span className="tracking-[0.3em] uppercase">LOGO</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="p-8">
+                    <div className="flex flex-col justify-between min-h-[120px]">
+                      <div>
+                        <p className="text-sm text-neutral-200 leading-relaxed">
+                          Lorem Ipsum is simply dummy text of the printing and
+                          typesetting industry. Lorem Ipsum has been the
+                          industry's standard dummy text ever since the 1500s.
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                        <div>
+                          <p className="font-medium">Sohil Shriyan</p>
+                          <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                            Marketing Head
+                          </p>
+                        </div>
+
+                        <span className="tracking-[0.3em] uppercase">LOGO</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 3 */}
+                  <div className="p-8">
+                    <div className="flex flex-col justify-between min-h-[120px]">
+                      <div>
+                        <p className="text-sm text-neutral-200 leading-relaxed">
+                          Lorem Ipsum is simply dummy text of the printing and
+                          typesetting industry. Lorem Ipsum has been the
+                          industry's standard dummy text ever since the 1500s.
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                        <div>
+                          <p className="font-medium">Sohil Shriyan</p>
+                          <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
+                            Marketing Head
+                          </p>
+                        </div>
+
+                        <span className="tracking-[0.3em] uppercase">LOGO</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
+
         <section className="w-full  py-24">
-          <div className="mx-auto max-w-[1440] px-4 py-8 md:px-8">
+          <div className="width-max py-8">
             {/* Heading */}
             <h2 className="text-sm tracking-[0.35em] text-[#666766] dark:text-[#B3B4B4] dark:border-color-[#B3B4B4] uppercase mb-16">
               Our Specializations
@@ -555,7 +707,7 @@ export default function HomePage() {
               </div>
 
               {/* Row 3 */}
-              <div className="border-t border-neutral-200 pt-12 border-b pb-20 sticky top-15 dark:bg-black bg-white">
+              <div className="border-t border-neutral-200 pt-12 border-b pb-20 sticky  dark:bg-black bg-white">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
                   <div className="md:col-span-1 dark:text-white text-lg font-light">
                     03
@@ -581,7 +733,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section className="w-full mx-auto max-w-[1440px] px-4 py-8 md:px-8">
+        <section className="w-full width-max py-8">
           {/* Heading */}
           <h2 className="text-center text-sm tracking-[0.35em] text-[#666766] dark:text-[#B3B4B4] dark:border-color-[#B3B4B4] uppercase mb-16">
             Our <span className="italic">Publications</span>

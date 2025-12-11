@@ -5,10 +5,10 @@ import Image from "next/image";
 
 export function SiteFooter() {
   return (
-    <div className="relative w-full bg-black text-white pt-24 pb-12 overflow-hidden">
-      <div className="flex flex-row justify-between align-top">
+    <div className="relative w-full bg-black text-white pt-12 md:pt-24 md:pb-12 overflow-hidden">
+      <div className=" md:flex-row justify-between align-top">
         {/* CONTACT SECTION */}
-        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row align-top h-full">
+        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row align-top h-full mb-10">
           <div>
             <div className="flex horizontal items-center w-full justify-between align-center">
               <h2 className="text-xl tracking-wider">CONTACT US</h2>
@@ -26,33 +26,35 @@ export function SiteFooter() {
                 <path d="M0 9.89893H30" stroke="white" />
               </svg>
             </div>
-            <div className="w-48 border-b-[1px] mt-2 border-white"></div>
+            <div className="w-48 border-b mt-2 border-white"></div>
           </div>
         </div>
 
         {/* NAVIGATION COLUMNS */}
-        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10  h-full align-top ">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 md:gap-10  h-full align-top ">
           <div>
-            <p className="mb-2 text-sm tracking-wider">TERMS AND CONDITIONS</p>
+            <p className="md:mb-2 text-sm tracking-wider">
+              TERMS AND CONDITIONS
+            </p>
             <p className="text-sm tracking-wider">PRIVACY POLICY</p>
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wider">PROJECTS</p>
+            <p className="md:md:mb-2 text-sm tracking-wider">PROJECTS</p>
             <p className="text-sm tracking-wider">BLOGS</p>
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wider">ABOUT</p>
+            <p className="md:mb-2 text-sm tracking-wider">ABOUT</p>
             <p className="text-sm tracking-wider">BOOK A CALL</p>
           </div>
         </div>
       </div>
 
       {/* BOTTOM ROW */}
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center mt-24">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24">
         <p className="text-sm tracking-wider">
-          Vivek Varma Architects © 2025. All Rights Reserved.
+          Vivek Varma Architects © 2025. <br></br>All Rights Reserved.
         </p>
 
         <p className="text-sm tracking-wider my-4 md:my-0">GSTIN:</p>
@@ -70,7 +72,7 @@ export function SiteFooter() {
       </div>
 
       {/* BACKGROUND SVG / WATERMARK */}
-      <div className="pointer-events-none inset-x-0 mt-12 mx-auto px-6 bottom-6 flex justify-center opacity-100">
+      <div className="pointer-events-none inset-x-0 md:mt-12 mx-auto px-6 bottom-6 flex justify-center opacity-100">
         <svg
           width="1353"
           height="257"

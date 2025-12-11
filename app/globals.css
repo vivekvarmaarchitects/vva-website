@@ -122,3 +122,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+.common-heading {
+  @apply font-sans text-xl lg:text-sm text-[#666766] tracking-[4px] uppercase dark:text-[#B3B4B4];
+}
+
+.width-max {
+  @apply max-w-[1440px] mx-auto px-4 md:px-8;
+}
