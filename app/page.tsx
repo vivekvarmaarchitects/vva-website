@@ -93,7 +93,7 @@ export default function HomePage() {
         className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full
 "
       >
-        <div className="md:flex horizontal block space-between gap-5  width-max py-5">
+        <div className="md:flex horizontal block space-between gap-5  width-max py-5 mt-16">
           <SplitText
             text="Crafting spatial narratives grounded in human experience"
             className="flex font-sans text-5xl font-regular"
@@ -133,7 +133,7 @@ export default function HomePage() {
             />
           </div>
         </div>
-        <div className="w-full width-max py-5 text-center border-b-2 border-color-[#666766] common-heading dark:border-color-[#B3B4B4]">
+        <div className="w-full width-max py-5 text-center border-b dark:border-color-[#B3B4B4] common-heading dark:border-color-[#B3B4B4]">
           <p>
             Our <span className="italic">Raison d'être</span>
           </p>
@@ -172,6 +172,7 @@ export default function HomePage() {
           />
           
         </div>
+        <div className="border-b dark:border-color-[#B3B4B4]"></div>
         <p className="width-max common-heading mb-10 md:my-12 text-center md:text-left">
           FEATURED <span className="italic">PROJECTS</span>
         </p>
@@ -339,7 +340,7 @@ export default function HomePage() {
                   <tbody>
                     <tr className="border-b dark:border-white">
                       {/* <!-- 30+ --> */}
-                      <td className="p-8 align-top border dark:border-white">
+                      <td className="p-8 align-top border dark:border-white min-w-[150px]">
                         <CountUp
                           from={0}
                           to={30}
@@ -355,7 +356,7 @@ export default function HomePage() {
                       </td>
 
                       {/* <!-- 700+ --> */}
-                      <td className="p-8 align-top border dark:border-white">
+                      <td className="p-8 align-top border dark:border-white min-w-[150px]">
                         <CountUp
                           from={0}
                           to={700}
@@ -371,7 +372,7 @@ export default function HomePage() {
                       </td>
 
                       {/* Testimonial (spans 2 columns) */}
-                      <td colSpan={3} className="p-8 align-top w-full min-w-sm">
+                      <td colSpan={3} className="p-8 align-top w-full min-w-sm min-w-[150px]">
                         <div className="flex flex-col justify-between min-h-[120px]">
                           {/* Top text */}
                           <div>
@@ -400,7 +401,7 @@ export default function HomePage() {
                       </td>
 
                       {/* <!-- 41 --> */}
-                      <td className="p-8 align-top border dark:border-white">
+                      <td className="p-8 align-top border dark:border-white min-w-[150px]">
                         <CountUp
                           from={0}
                           to={41}
@@ -422,7 +423,7 @@ export default function HomePage() {
                     {/* <!-- Bottom row --> */}
                     <tr>
                       {/* Testimonial (spans 3 columns) */}
-                      <td colSpan={2} className="p-8 align-top w-full">
+                      <td colSpan={2} className="p-8 align-top w-full min-w-[150px]">
                         <div className="flex flex-col justify-between min-h-[120px]">
                           {/* Top text */}
                           <div>
@@ -453,7 +454,7 @@ export default function HomePage() {
                       {/* <!-- 200+ --> */}
                       <td
                         colSpan={1}
-                        className="p-8 align-top border dark:border-white"
+                        className="p-8 align-top border dark:border-white min-w-[150px]"
                       >
                         <CountUp
                           from={100}
@@ -470,7 +471,7 @@ export default function HomePage() {
                       </td>
 
                       {/* Testimonial (spans 2 columns) */}
-                      <td colSpan={3} className="p-8 align-top w-full min-w-sm">
+                      <td colSpan={3} className="p-8 align-top w-full min-w-sm min-w-[150px]">
                         <div className="flex flex-col justify-between min-h-[120px]">
                           {/* Top text */}
                           <div>
@@ -658,14 +659,14 @@ export default function HomePage() {
             <div className="space-y-20">
               {/* Row 1 */}
               <div className="border-t border-neutral-200 pt-12 sticky top-15 dark:bg-black bg-white">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-30 items-center">
                   {/* Number */}
                   <div className="md:col-span-1 dark:text-white text-lg font-light">
                     01
                   </div>
 
                   {/* Title + Description */}
-                  <div className="md:col-span-5">
+                  <div className="md:col-span-3">
                     <h3 className="text-xl font-semibold mb-2">
                       Interior Design
                     </h3>
@@ -677,11 +678,11 @@ export default function HomePage() {
                   </div>
 
                   {/* Image */}
-                  <div className="md:col-span-6">
+                  <div className="md:col-span-2">
                     <img
                       src="/interior.png"
                       alt="Interior Design"
-                      className="w-full h-auto rounded-md object-cover"
+                      className="w-full h-auto rounded-md object-cover  w-[50%] justify-left"
                     />
                   </div>
                 </div>
@@ -689,12 +690,12 @@ export default function HomePage() {
 
               {/* Row 2 */}
               <div className="border-t border-neutral-200 pt-12 sticky top-15 dark:bg-black bg-white">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-30 items-center">
                   <div className="md:col-span-1 dark:text-white text-lg font-light">
                     02
                   </div>
 
-                  <div className="md:col-span-5">
+                  <div className="md:col-span-3">
                     <h3 className="text-xl font-semibold mb-2">Architecture</h3>
                     <p className="dark:text-white leading-relaxed">
                       Complementary architectural design grounded in contextual
@@ -702,7 +703,7 @@ export default function HomePage() {
                     </p>
                   </div>
 
-                  <div className="md:col-span-6">
+                  <div className="md:col-span-2">
                     <img
                       src="/Architecture.png"
                       alt="Architecture"
@@ -714,12 +715,12 @@ export default function HomePage() {
 
               {/* Row 3 */}
               <div className="border-t border-neutral-200 pt-12 border-b pb-20 sticky dark:bg-black bg-white">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-30 items-center">
                   <div className="md:col-span-1 dark:text-white text-lg font-light">
                     03
                   </div>
 
-                  <div className="md:col-span-5">
+                  <div className="md:col-span-3">
                     <h3 className="text-xl font-semibold mb-2">Space Design</h3>
                     <p className="dark:text-white leading-relaxed">
                       Spatial compositions that shape circulation, mood, and
@@ -727,7 +728,7 @@ export default function HomePage() {
                     </p>
                   </div>
 
-                  <div className="md:col-span-6">
+                  <div className="md:col-span-2">
                     <img
                       src="/Space.png"
                       alt="Space Design"
@@ -746,99 +747,107 @@ export default function HomePage() {
           </h2>
 
           {/* Card Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
             {/* CARD 1 */}
-            <div className="border border-neutral-200 rounded-md overflow-hidden flex flex-col">
+            <div className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col">
               {/* Image Placeholder */}
-              <div className="w-full h-48 bg-neutral-200"></div>
+              <div className="w-full h-48 p-10 bg-neutral-200"></div>
 
               {/* Content */}
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-4">
-                  <span className="px-3 py-1 dark:bg-white dark:text-black text-xs uppercase tracking-wide rounded-sm">
+                  <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
                     Architecture
                   </span>
-                  <span className="text-xs text-neutral-500 tracking-wide">
+                  <span className="text-xs dark:text-white tracking-wide">
                     05 minute read
                   </span>
                 </div>
 
-                <h3 className="text-xl font-medium leading-snug">
+                <h3 className="text-2xl font-medium leading-snug">
                   Lorem Ipsum is simply dummy text of the printing and
                 </h3>
 
-                <p className="text-neutral-500 text-sm leading-relaxed">
+                <p className="dark:text-white text-sm leading-relaxed">
                   Lorem Ipsum is simply dummy text of the printing and
                   typesetting industry. Lorem Ipsum has been the industr….
                 </p>
               </div>
 
               {/* Footer */}
-              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm text-neutral-500">
+              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
                 <span>Written by</span>
                 <span>Kaisuke Rajput</span>
               </div>
             </div>
 
             {/* CARD 2 */}
-            <div className="border border-neutral-200 rounded-md overflow-hidden flex flex-col">
-              <div className="w-full h-48 bg-neutral-200"></div>
+               <div className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col">
+              {/* Image Placeholder */}
+              <div className="w-full h-48 p-10 bg-neutral-200"></div>
 
+              {/* Content */}
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-4">
-                  <span className="px-3 py-1 dark:bg-white dark:text-black text-xs uppercase tracking-wide rounded-sm">
-                    Interior
+                  <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
+                    Architecture
                   </span>
-                  <span className="text-xs text-neutral-500 tracking-wide">
+                  <span className="text-xs dark:text-white tracking-wide">
                     05 minute read
                   </span>
                 </div>
 
-                <h3 className="text-xl font-medium leading-snug">
+                <h3 className="text-2xl font-medium leading-snug">
                   Lorem Ipsum is simply dummy text of the printing and
                 </h3>
 
-                <p className="text-neutral-500 text-sm leading-relaxed">
+                <p className="dark:text-white text-sm leading-relaxed">
                   Lorem Ipsum is simply dummy text of the printing and
                   typesetting industry. Lorem Ipsum has been the industr….
                 </p>
               </div>
 
-              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm text-neutral-500">
+              {/* Footer */}
+              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
                 <span>Written by</span>
                 <span>Kaisuke Rajput</span>
               </div>
             </div>
+
 
             {/* CARD 3 */}
-            <div className="border border-neutral-200 rounded-md overflow-hidden flex flex-col">
-              <div className="w-full h-48 bg-neutral-200"></div>
+            <div className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col">
+              {/* Image Placeholder */}
+              <div className="w-full h-48 p-10 bg-neutral-200"></div>
 
+              {/* Content */}
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-4">
-                  <span className="px-3 py-1 dark:bg-white dark:text-black text-xs uppercase tracking-wide rounded-sm">
-                    Spacial
+                  <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
+                    Architecture
                   </span>
-                  <span className="text-xs text-neutral-500 tracking-wide">
+                  <span className="text-xs dark:text-white tracking-wide">
                     05 minute read
                   </span>
                 </div>
 
-                <h3 className="text-xl font-medium leading-snug">
+                <h3 className="text-2xl font-medium leading-snug">
                   Lorem Ipsum is simply dummy text of the printing and
                 </h3>
 
-                <p className="text-neutral-500 text-sm leading-relaxed">
+                <p className="dark:text-white text-sm leading-relaxed">
                   Lorem Ipsum is simply dummy text of the printing and
                   typesetting industry. Lorem Ipsum has been the industr….
                 </p>
               </div>
 
-              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm text-neutral-500">
+              {/* Footer */}
+              <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
                 <span>Written by</span>
                 <span>Kaisuke Rajput</span>
               </div>
             </div>
+
           </div>
         </section>
       </div>

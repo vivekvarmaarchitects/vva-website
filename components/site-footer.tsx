@@ -5,17 +5,17 @@ import Image from "next/image";
 
 export function SiteFooter() {
   return (
-    <div className="relative w-full bg-black text-white pt-12 md:pt-24 md:pb-12 overflow-hidden">
-      <div className=" md:flex-row justify-between align-top">
+    <div className=" width-max relative w-full bg-black text-white pt-12 md:pt-24 md:pb-12 overflow-hidden">
+      <div className=" md:flex justify-between align-top">
         {/* CONTACT SECTION */}
-        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row align-top h-full mb-10">
+        <div className="flex flex-col md:flex-row align-top h-full mb-10">
           <div>
-            <div className="flex horizontal items-center w-full justify-between align-center">
+            <div className="flex horizontal items-center w-full min-w-[350px] justify-between align-center">
               <h2 className="text-xl tracking-wider">CONTACT US</h2>
               <svg
-                width="31"
+                width="50"
                 height="20"
-                viewBox="0 0 31 20"
+                viewBox="0 0 10 20"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -26,12 +26,12 @@ export function SiteFooter() {
                 <path d="M0 9.89893H30" stroke="white" />
               </svg>
             </div>
-            <div className="w-48 border-b mt-2 border-white"></div>
+            <div className="w-full border-b mt-2 border-white"></div>
           </div>
         </div>
 
         {/* NAVIGATION COLUMNS */}
-        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 md:gap-10  h-full align-top ">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 md:gap-30  h-full align-top ">
           <div>
             <p className="md:mb-2 text-sm tracking-wider">
               TERMS AND CONDITIONS
@@ -52,7 +52,7 @@ export function SiteFooter() {
       </div>
 
       {/* BOTTOM ROW */}
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24">
+      <div className="flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24">
         <p className="text-sm tracking-wider">
           Vivek Varma Architects © 2025. <br></br>All Rights Reserved.
         </p>
