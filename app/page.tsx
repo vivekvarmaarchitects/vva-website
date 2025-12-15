@@ -116,8 +116,8 @@ export default function HomePage() {
               markers: false,
             }}
           />
-          <h2 className="flex font-display md:w-[50%]">
-            We, Vivek Varma Architects, are a practice rooted in interior
+          <h2 className=" font-display md:w-[50%]">
+            We, <u>Vivek Varma Architects</u>, are a practice rooted in interior
             architecture, shaping environments for those who value design,
             craft, and context.
           </h2>
@@ -140,13 +140,18 @@ export default function HomePage() {
         </div>
         <div className="width-max">
           <SplitText
-            text="Our work explores the relationship between light, material,
-        proportion, and movement. We approach every interior as a dialogue
-        between architecture and the people who inhabit it, crafting spaces
-        that feel intentional, quiet, and deeply lived in. With decades of
-        practice across residential, commercial, and developer-led
-        environments, we bring a refined sensibility to every project."
-            className="font-display text-2xl font-light py-10"
+
+          text={
+    <>
+      Our{"\u00A0"}work explores the relationship between light, material, proportion,
+        and movement. We approach every interior as a dialogue between
+        architecture and the people who inhabit it, crafting spaces that feel
+        intentional, quiet, and deeply lived in. With decades of practice across
+        residential, commercial, and developer-led environments, we bring a
+        refined sensibility to every project.
+    </>
+  }
+            className="font-display text-2xl font-light py-10 lede-our-work"
             delay={100}
             duration={0.6}
             ease="power3.out"
@@ -165,6 +170,7 @@ export default function HomePage() {
               markers: false,
             }}
           />
+          
         </div>
         <p className="width-max common-heading mb-10 md:my-12 text-center md:text-left">
           FEATURED <span className="italic">PROJECTS</span>
@@ -329,11 +335,11 @@ export default function HomePage() {
 
             <div className="overflow-x-auto">
               <div className="hidden lg:block">
-                <table className="w-full border border-neutral-700 text-left min-w-[600px]">
+                <table className="w-full border dark:border-white text-left min-w-[600px]">
                   <tbody>
-                    <tr className="border-b border-neutral-700">
+                    <tr className="border-b dark:border-white">
                       {/* <!-- 30+ --> */}
-                      <td className="p-8 align-top border border-neutral-700">
+                      <td className="p-8 align-top border dark:border-white">
                         <CountUp
                           from={0}
                           to={30}
@@ -343,13 +349,13 @@ export default function HomePage() {
                           className="text-4xl font-light"
                         />
                         <span className="text-4xl font-light">+</span>
-                        <p className="mt-4 text-sm text-neutral-300">
+                        <p className="mt-4 text-sm dark:text-white">
                           Years of practice
                         </p>
                       </td>
 
                       {/* <!-- 700+ --> */}
-                      <td className="p-8 align-top border border-neutral-700">
+                      <td className="p-8 align-top border dark:border-white">
                         <CountUp
                           from={0}
                           to={700}
@@ -359,7 +365,7 @@ export default function HomePage() {
                           className="text-4xl font-light"
                         />
                         <span className="text-4xl font-light">+</span>
-                        <p className="mt-4 text-sm text-neutral-300">
+                        <p className="mt-4 text-sm dark:text-white">
                           Completed environments
                         </p>
                       </td>
@@ -378,7 +384,7 @@ export default function HomePage() {
                           </div>
 
                           {/* Bottom block (Sohil + Logo) */}
-                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                          <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                             <div>
                               <p className="font-medium">Sohil Shriyan</p>
                               <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -394,7 +400,7 @@ export default function HomePage() {
                       </td>
 
                       {/* <!-- 41 --> */}
-                      <td className="p-8 align-top border border-neutral-700">
+                      <td className="p-8 align-top border dark:border-white">
                         <CountUp
                           from={0}
                           to={41}
@@ -404,14 +410,14 @@ export default function HomePage() {
                           className="text-4xl font-light"
                         />
 
-                        <p className="mt-4 text-sm text-neutral-300">
+                        <p className="mt-4 text-sm dark:text-white">
                           Lorem Ipsum
                         </p>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-                <table className="w-full border border-neutral-700 text-left min-w-[600px]">
+                <table className="w-full border dark:border-white text-left min-w-[600px]">
                   <tbody>
                     {/* <!-- Bottom row --> */}
                     <tr>
@@ -429,7 +435,7 @@ export default function HomePage() {
                           </div>
 
                           {/* Bottom block (Sohil + Logo) */}
-                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                          <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                             <div>
                               <p className="font-medium">Sohil Shriyan</p>
                               <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -447,7 +453,7 @@ export default function HomePage() {
                       {/* <!-- 200+ --> */}
                       <td
                         colSpan={1}
-                        className="p-8 align-top border border-neutral-700"
+                        className="p-8 align-top border dark:border-white"
                       >
                         <CountUp
                           from={100}
@@ -458,7 +464,7 @@ export default function HomePage() {
                           className="text-4xl font-light"
                         />
                         <span className="text-4xl font-light">+</span>
-                        <p className="mt-4 text-sm text-neutral-300">
+                        <p className="mt-4 text-sm dark:text-white">
                           Clients <br /> across India
                         </p>
                       </td>
@@ -477,7 +483,7 @@ export default function HomePage() {
                           </div>
 
                           {/* Bottom block (Sohil + Logo) */}
-                          <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                          <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                             <div>
                               <p className="font-medium">Sohil Shriyan</p>
                               <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -498,9 +504,9 @@ export default function HomePage() {
               {/* Mobile div */}
               <div className="block lg:hidden">
                 {/* STATS GRID (replaces first table) */}
-                <div className="grid grid-cols-2 border border-neutral-700">
+                <div className="grid grid-cols-2 border dark:border-white">
                   {/* 30+ */}
-                  <div className="p-8 border-b border-neutral-700 border-r">
+                  <div className="p-8 border-b dark:border-white border-r">
                     <CountUp
                       from={0}
                       to={30}
@@ -510,13 +516,13 @@ export default function HomePage() {
                       className="text-4xl font-light"
                     />
                     <span className="text-4xl font-light">+</span>
-                    <p className="mt-4 text-sm text-neutral-300">
+                    <p className="mt-4 text-sm dark:text-white">
                       Years of practice
                     </p>
                   </div>
 
                   {/* 700+ */}
-                  <div className="p-8 border-b border-neutral-700">
+                  <div className="p-8 border-b dark:border-white">
                     <CountUp
                       from={0}
                       to={700}
@@ -526,13 +532,13 @@ export default function HomePage() {
                       className="text-4xl font-light"
                     />
                     <span className="text-4xl font-light">+</span>
-                    <p className="mt-4 text-sm text-neutral-300">
+                    <p className="mt-4 text-sm dark:text-white">
                       Completed environments
                     </p>
                   </div>
 
                   {/* 41 */}
-                  <div className="p-8  border-neutral-700 border-r">
+                  <div className="p-8  dark:border-white border-r">
                     <CountUp
                       from={0}
                       to={41}
@@ -541,7 +547,7 @@ export default function HomePage() {
                       duration={1}
                       className="text-4xl font-light"
                     />
-                    <p className="mt-4 text-sm text-neutral-300">Lorem Ipsum</p>
+                    <p className="mt-4 text-sm dark:text-white">Lorem Ipsum</p>
                   </div>
 
                   {/* 200+ */}
@@ -555,14 +561,14 @@ export default function HomePage() {
                       className="text-4xl font-light"
                     />
                     <span className="text-4xl font-light">+</span>
-                    <p className="mt-4 text-sm text-neutral-300">
+                    <p className="mt-4 text-sm dark:text-white">
                       Clients <br /> across India
                     </p>
                   </div>
                 </div>
 
                 {/* TESTIMONIAL STACK (replaces second table) */}
-                <div className="border border-neutral-700 divide-y divide-neutral-700">
+                <div className="border dark:border-white divide-y divide-white">
                   {/* Row 1 */}
                   <div className="p-8">
                     <div className="flex flex-col justify-between min-h-[120px]">
@@ -576,7 +582,7 @@ export default function HomePage() {
                       </div>
 
                       {/* Bottom block (Sohil + Logo) */}
-                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                      <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                         <div>
                           <p className="font-medium">Sohil Shriyan</p>
                           <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -600,7 +606,7 @@ export default function HomePage() {
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                      <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                         <div>
                           <p className="font-medium">Sohil Shriyan</p>
                           <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -624,7 +630,7 @@ export default function HomePage() {
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-end pt-6 text-xs text-neutral-300 w-full">
+                      <div className="flex justify-between items-end pt-6 text-xs dark:text-white w-full">
                         <div>
                           <p className="font-medium">Sohil Shriyan</p>
                           <p className="text-[0.7rem] uppercase tracking-[0.2em] mt-1">
@@ -707,7 +713,7 @@ export default function HomePage() {
               </div>
 
               {/* Row 3 */}
-              <div className="border-t border-neutral-200 pt-12 border-b pb-20 sticky  dark:bg-black bg-white">
+              <div className="border-t border-neutral-200 pt-12 border-b pb-20 sticky dark:bg-black bg-white">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
                   <div className="md:col-span-1 dark:text-white text-lg font-light">
                     03
