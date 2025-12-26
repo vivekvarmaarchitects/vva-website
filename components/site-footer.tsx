@@ -1,32 +1,32 @@
 "use client";
 
+import { ThemeProvider } from "next-themes";
+
 import { FaFacebookF, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import Image from "next/image";
 
 export function SiteFooter() {
   return (
-    <div className=" width-max relative w-full bg-black text-white pt-12 md:pt-24 md:pb-12 overflow-hidden">
-      <div className=" md:flex justify-between align-top">
+    <div className=" relative w-full bg-black dark:bg-white text-white dark:text-black pt-12 md:pt-24 md:pb-12 overflow-hidden">
+      <div className=" md:flex justify-between align-top width-max">
         {/* CONTACT SECTION */}
         <div className="flex flex-col md:flex-row align-top h-full mb-10">
           <div>
             <div className="flex horizontal items-center w-full min-w-[350px] justify-between align-center">
               <h2 className="text-xl tracking-wider">CONTACT US</h2>
-              <svg
-                width="50"
-                height="20"
-                viewBox="0 0 10 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M20.4546 0.353516L30 9.89897L20.4546 19.4444"
-                  stroke="white"
-                />
-                <path d="M0 9.89893H30" stroke="white" />
-              </svg>
+                <svg
+                  width="50"
+                  height="20"
+                  viewBox="0 0 30 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-white dark:stroke-black"
+                >
+                  <path d="M20.4546 0.353516L30 9.89897L20.4546 19.4444" />
+                  <path d="M0 9.89893H30" />
+                </svg>
             </div>
-            <div className="w-full border-b mt-2 border-white"></div>
+            <div className="w-full border-b mt-2 dark:border-black "></div>
           </div>
         </div>
 
@@ -52,7 +52,7 @@ export function SiteFooter() {
       </div>
 
       {/* BOTTOM ROW */}
-      <div className="flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24">
+      <div className="flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24 width-max">
         <p className="text-sm tracking-wider">
           Vivek Varma Architects © 2025. <br></br>All Rights Reserved.
         </p>
@@ -73,13 +73,15 @@ export function SiteFooter() {
 
       {/* BACKGROUND SVG / WATERMARK */}
       <div className="pointer-events-none inset-x-0 md:mt-12 mx-auto px-6 bottom-6 flex justify-center opacity-100">
+       
+       {/* Dark gradient */}
         <svg
           width="1353"
           height="257"
           viewBox="0 0 1353 257"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full max-w-6xl"
+          className="w-full max-w-6xl dark:hidden "
         >
           <path
             d="M310.029 256.395H113.279L0 0H196.747L310.029 256.395Z"
@@ -159,6 +161,85 @@ export function SiteFooter() {
             </linearGradient>
           </defs>
         </svg>
+
+        {/* White gradient */}
+<svg
+  width="1353"
+  height="257"
+  viewBox="0 0 1353 257"
+  xmlns="http://www.w3.org/2000/svg"
+  className="w-full max-w-6xl hidden dark:block"
+  fill="none"
+  aria-hidden="true"
+>
+  <path d="M310.029 256.395H113.279L0 0H196.747L310.029 256.395Z" fill="url(#g0)" />
+  <path d="M488.819 217.054L506.206 256.355H310.062L408.117 34.3604L488.819 217.054Z" fill="url(#g1)" />
+  <path d="M732.977 256.36H536.227L423.125 0.390524L423.305 0H619.698L619.91 0.390524L732.977 256.36Z" fill="url(#g2)" />
+  <path d="M1042.97 0H1239.72L1353 256.395H1156.25L1042.97 0Z" fill="url(#g3)" />
+  <path d="M732.98 256.395L846.225 0H1042.97L929.727 256.395H732.98Z" fill="url(#g4)" />
+
+  <defs>
+    <linearGradient
+      id="g0"
+      x1="142.641"
+      y1="1.99999"
+      x2="142.641"
+      y2="256.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor="#dedede" />
+      <stop offset="1" stopColor="#ffffff" />
+    </linearGradient>
+
+    <linearGradient
+      id="g1"
+      x1="400.306"
+      y1="36.092"
+      x2="400.306"
+      y2="256.445"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor="#dedede" />
+      <stop offset="1" stopColor="#ffffff" />
+    </linearGradient>
+
+    <linearGradient
+      id="g2"
+      x1="565.685"
+      y1="1.99971"
+      x2="565.685"
+      y2="256.465"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor="#dedede" />
+      <stop offset="1" stopColor="#ffffff" />
+    </linearGradient>
+
+    <linearGradient
+      id="g3"
+      x1="1185.61"
+      y1="1.99999"
+      x2="1185.61"
+      y2="256.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor="#dedede" />
+      <stop offset="1" stopColor="#ffffff" />
+    </linearGradient>
+
+    <linearGradient
+      id="g4"
+      x1="875.604"
+      y1="1.99999"
+      x2="875.604"
+      y2="256.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor="#dedede" />
+      <stop offset="1" stopColor="#ffffff" />
+    </linearGradient>
+  </defs>
+</svg>
       </div>
     </div>
   );
