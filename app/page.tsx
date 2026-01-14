@@ -94,7 +94,7 @@ const stripOuterTags = (value: string | undefined, tags: string[]) => {
   return result.trim();
 };
 
-const normalizeStringArray = (value?: string | string[]) => {
+const normalizeStringArray = (value?: string | string[] | null) => {
   if (!value) {
     return [];
   }

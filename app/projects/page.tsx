@@ -6,6 +6,7 @@ import SplitText from "@/components/animations/TextReveal";
 import FadeIn from "@/components/animations/FadeIn";
 
 import PublicationSection from "@/components/sections/publication-section";
+import OurWorks from "@/components/sections/our-works-section";
 
 export default function ProjectsPage() {
   return (
@@ -72,6 +73,7 @@ export default function ProjectsPage() {
         className="width-max common-heading mb-10 md:my-12 text-center md:text-center"
         dangerouslySetInnerHTML={{ __html: "Our works" }}
       />
+      <OurWorks />
       <PublicationSection />
     </div>
   );

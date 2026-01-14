@@ -42,7 +42,7 @@ export default function Conversations() {
             </svg>
             <span>
               <span className="underline decoration-2 underline-offset-6">
-                Let's Shape
+                Let&apos;s Shape
               </span>{" "}
               Something
             </span>
