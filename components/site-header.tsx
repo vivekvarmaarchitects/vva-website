@@ -43,7 +43,7 @@ export function SiteHeader() {
               About
             </Link>
             <Link
-              href="#projects"
+              href="/projects"
               className="text-black/80 hover:text-black dark:text-white/80 dark:hover:text-white transition-colors"
             >
               Projects

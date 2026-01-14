@@ -5,6 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import CountUp from "@/components/animations/CountUp";
 
+type ResultsVisionSectionProps = {
+  headingHtml?: string;
+};
+
 type NumbersAndTestimonialsRecord = {
   id?: string;
   collectionId?: string;
@@ -31,6 +35,8 @@ type NumbersAndTestimonialsRecord = {
   logo_5?: string | string[];
   logo_6?: string | string[];
 };
+
+const DEFAULT_HEADING_HTML = "RESULTS THAT <em>MATCH YOUR VISION</em>";
 
 const DEFAULT_RECORD: NumbersAndTestimonialsRecord = {
   heading_1: "30",
@@ -111,10 +117,27 @@ const buildFileUrl = (
   return `${normalizedBaseUrl}/api/files/${record.collectionId}/${record.id}/${encodedName}`;
 };
 
-export default function ResultsVisionSection() {
-  const [record, setRecord] = useState<NumbersAndTestimonialsRecord>(
-    DEFAULT_RECORD
-  );
+const stripOuterParagraph = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+  const trimmed = value.trim();
+  const openTag = /^<p\b[^>]*>/i;
+  const closeTag = /<\/p>$/i;
+  if (openTag.test(trimmed) && closeTag.test(trimmed)) {
+    return trimmed.replace(openTag, "").replace(closeTag, "").trim();
+  }
+  return trimmed;
+};
+
+export default function ResultsVisionSection({
+  headingHtml,
+}: ResultsVisionSectionProps) {
+  const [record, setRecord] =
+    useState<NumbersAndTestimonialsRecord>(DEFAULT_RECORD);
+
+  const headingContent =
+    stripOuterParagraph(headingHtml) || DEFAULT_HEADING_HTML;
 
   const recordUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records/${POCKETBASE_RECORD_ID}`;
 
@@ -189,10 +212,13 @@ export default function ResultsVisionSection() {
         load();
       }
 
-      timeoutId = window.setTimeout(() => {
-        load();
-        intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
-      }, shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining);
+      timeoutId = window.setTimeout(
+        () => {
+          load();
+          intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
+        },
+        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining
+      );
     } else {
       load();
     }
@@ -278,9 +304,10 @@ export default function ResultsVisionSection() {
   return (
     <section className="bg-black text-white">
       <div className="width-max py-8">
-        <p className="mb-12 text-center font-[#C3C3C3] common-heading ">
-          RESULTS THAT <span className="italic">MATCH YOUR VISION</span>
-        </p>
+        <p
+          className="mb-12 text-center font-[#C3C3C3] common-heading "
+          dangerouslySetInnerHTML={{ __html: headingContent }}
+        />
 
         <div className="overflow-x-auto">
           <div className="hidden lg:block">
@@ -508,9 +535,7 @@ export default function ResultsVisionSection() {
                   className="text-4xl font-light"
                 />
                 {stats[0].suffix ? (
-                  <span className="text-4xl font-light">
-                    {stats[0].suffix}
-                  </span>
+                  <span className="text-4xl font-light">{stats[0].suffix}</span>
                 ) : null}
                 <p className="mt-4 text-sm dark:text-white">{stats[0].label}</p>
               </div>
@@ -525,9 +550,7 @@ export default function ResultsVisionSection() {
                   className="text-4xl font-light"
                 />
                 {stats[1].suffix ? (
-                  <span className="text-4xl font-light">
-                    {stats[1].suffix}
-                  </span>
+                  <span className="text-4xl font-light">{stats[1].suffix}</span>
                 ) : null}
                 <p className="mt-4 text-sm dark:text-white">{stats[1].label}</p>
               </div>
@@ -554,9 +577,7 @@ export default function ResultsVisionSection() {
                   className="text-4xl font-light"
                 />
                 {stats[3].suffix ? (
-                  <span className="text-4xl font-light">
-                    {stats[3].suffix}
-                  </span>
+                  <span className="text-4xl font-light">{stats[3].suffix}</span>
                 ) : null}
                 <p className="mt-4 text-sm dark:text-white">
                   {renderLabel(stats[3].label)}

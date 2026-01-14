@@ -7,7 +7,8 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger, GSAPSplitText, useGSAP);
 
 export interface SplitTextProps {
-  text: React.ReactNode;
+  text?: React.ReactNode;
+  html?: string;
   className?: string;
   delay?: number;
   duration?: number;
@@ -17,7 +18,7 @@ export interface SplitTextProps {
   to?: gsap.TweenVars;
   threshold?: number;
   rootMargin?: string;
-  tag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
+  tag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
   textAlign?: React.CSSProperties["textAlign"];
   onLetterAnimationComplete?: () => void;
 
@@ -30,6 +31,7 @@ export interface SplitTextProps {
 
 const SplitText: React.FC<SplitTextProps> = ({
   text,
+  html,
   className = "",
   delay = 100,
   duration = 0.6,
@@ -47,7 +49,10 @@ const SplitText: React.FC<SplitTextProps> = ({
   enableScrollTrigger = true,
   scrollTriggerConfig,
 }) => {
-  const ref = useRef<HTMLParagraphElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
+  const setRef = (node: HTMLElement | null) => {
+    ref.current = node;
+  };
   const animationCompletedRef = useRef(false);
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
 
@@ -63,7 +68,9 @@ const SplitText: React.FC<SplitTextProps> = ({
 
   useGSAP(
     () => {
-      if (!ref.current || !text || !fontsLoaded) return;
+      const hasContent =
+        typeof html === "string" ? html.trim().length > 0 : Boolean(text);
+      if (!ref.current || !hasContent || !fontsLoaded) return;
 
       const el = ref.current as HTMLElement & {
         _rbsplitInstance?: GSAPSplitText;
@@ -180,6 +187,7 @@ const SplitText: React.FC<SplitTextProps> = ({
     {
       dependencies: [
         text,
+        html,
         delay,
         duration,
         ease,
@@ -198,6 +206,9 @@ const SplitText: React.FC<SplitTextProps> = ({
   );
 
   const renderTag = () => {
+    const contentProps =
+      html !== undefined ? { dangerouslySetInnerHTML: { __html: html } } : {};
+    const content = html !== undefined ? null : text;
     const style: React.CSSProperties = {
       textAlign,
       wordWrap: "break-word",
@@ -210,44 +221,50 @@ const SplitText: React.FC<SplitTextProps> = ({
     switch (tag) {
       case "h1":
         return (
-          <h1 ref={ref} style={style} className={classes}>
-            {text}
+          <h1 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h1>
         );
       case "h2":
         return (
-          <h2 ref={ref} style={style} className={classes}>
-            {text}
+          <h2 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h2>
         );
       case "h3":
         return (
-          <h3 ref={ref} style={style} className={classes}>
-            {text}
+          <h3 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h3>
         );
       case "h4":
         return (
-          <h4 ref={ref} style={style} className={classes}>
-            {text}
+          <h4 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h4>
         );
       case "h5":
         return (
-          <h5 ref={ref} style={style} className={classes}>
-            {text}
+          <h5 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h5>
         );
       case "h6":
         return (
-          <h6 ref={ref} style={style} className={classes}>
-            {text}
+          <h6 ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </h6>
+        );
+      case "div":
+        return (
+          <div ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
+          </div>
         );
       default:
         return (
-          <p ref={ref} style={style} className={classes}>
-            {text}
+          <p ref={setRef} style={style} className={classes} {...contentProps}>
+            {content}
           </p>
         );
     }
