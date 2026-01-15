@@ -352,10 +352,7 @@ export default function ResultsVisionSection({
                     </p>
                   </td>
 
-                  <td
-                    colSpan={3}
-                    className="p-8 align-top w-full min-w-sm min-w-[150px]"
-                  >
+                  <td colSpan={3} className="p-8 align-top w-full min-w-sm">
                     <div className="flex flex-col justify-between min-h-[120px]">
                       <div>
                         <p className="text-sm text-neutral-200 leading-relaxed">

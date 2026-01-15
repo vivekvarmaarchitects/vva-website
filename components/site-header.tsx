@@ -43,17 +43,17 @@ export function SiteHeader() {
               About
             </Link>
             <Link
-              href="/projects"
+              href="/design"
               className="text-black/80 hover:text-black dark:text-white/80 dark:hover:text-white transition-colors"
             >
-              Projects
+              Design
             </Link>
           </nav>
 
           <ThemeToggleButton />
 
           <Link
-            href="#contact"
+            href="/contact"
             className="hidden border border-black dark:border-white px-4 py-2 text-sm md:inline-flex items-center justify-center transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
           >
             Book a call

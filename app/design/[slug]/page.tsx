@@ -86,6 +86,7 @@ export default function Page() {
   const [project, setProject] = useState<ProjectRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
   // Carousel index for Image_1 slides.
   const [imageOneIndex, setImageOneIndex] = useState(0);
 
@@ -205,8 +206,11 @@ export default function Page() {
         // Reset project in case previous slug had data
         setProject(null);
       } finally {
-        // Stop loading UI no matter what (success or error)
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          // Stop loading UI no matter what (success or error)
+          setLoading(false);
+          setHasFetched(true);
+        }
       }
     })();
 
@@ -218,7 +222,7 @@ export default function Page() {
    * If we're done loading, and we have no project and no error,
    * it means the slug didn't match anything => show 404 page.
    */
-  if (!loading && !project && !err) {
+  if (hasFetched && !loading && !project && !err) {
     notFound();
   }
 
@@ -251,7 +255,7 @@ export default function Page() {
         <div className="font-display">
           <p>
             {/* TODO: make breakcrumb links Clickabele */}
-            Home / Projects / {project.Scope} / {project.Name}
+            Home / Design / {project.Scope} / {project.Name}
           </p>
         </div>
 
