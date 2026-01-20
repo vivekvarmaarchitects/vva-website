@@ -69,6 +69,12 @@ export function SiteHeader() {
             >
               Design
             </Link>
+            <Link
+              href="/blog"
+              className="text-black/80 hover:text-black dark:text-white/80 dark:hover:text-white transition-colors"
+            >
+              Publication
+            </Link>
           </nav>
 
           <ThemeToggleButton />
@@ -111,13 +117,13 @@ export function SiteHeader() {
 
       <div
         id="mobile-menu"
-        className={`fixed inset-x-0 top-16 z-40 flex h-[calc(100vh-4rem)] flex-col border-t border-black/10 bg-white px-4 pb-10 pt-6 backdrop-blur-md transition-all duration-300 ease-out dark:border-white/10 dark:bg-black md:hidden ${
+        className={`fixed inset-x-0 top-16 z-100 flex h-[calc(100vh-4rem)] flex-col border-t border-black/10 bg-white px-4 pb-10 pt-6 backdrop-blur-md transition-all duration-300 ease-out dark:border-white/10 dark:bg-black md:hidden ${
           isMenuOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
       >
-        <nav className="flex flex-col text-5xl tracking-tight text-black dark:text-white">
+        <nav className="flex flex-col text-5xl tracking-tight text-black dark:text-white z-100">
           <Link
             href="/about"
             onClick={handleCloseMenu}

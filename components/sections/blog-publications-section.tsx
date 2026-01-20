@@ -235,7 +235,7 @@ export default function BlogPublicationsSection() {
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-[160px_1fr] lg:grid-cols-[200px_1fr]">
-        <aside className="space-y-5 md:block md:z-0 sticky top-16 backdrop-blur-xs bg-white/75 dark:bg-black/75 z-50 py-3">
+        <aside className="space-y-5 md:block md:z-0 sticky top-16 backdrop-blur-xs bg-white/75 dark:bg-black/75 z-1 py-3">
           <p className="text-xs uppercase tracking-[0.25em] text-[#666766] dark:text-[#B3B4B4]">
             Filters
           </p>

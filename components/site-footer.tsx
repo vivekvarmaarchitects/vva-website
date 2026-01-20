@@ -55,7 +55,7 @@ export function SiteFooter() {
 
           <div>
             <Link href="/design" className={footerLinkClass}>
-              PROJECTS
+              DESIGN
             </Link>
             <Link href="/blog" className={footerLinkClass}>
               BLOGS
