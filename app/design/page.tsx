@@ -47,7 +47,7 @@ export default function ProjectsPage() {
       </div>
       <div className="width-max">
         <SplitText
-          html="                                           A curated overview of our interior design, architectural, and spatial explorations across residential, commercial, and public environments. Each project reflects our commitment to material integrity, spatial clarity, and thoughtful craftsmanship."
+          html="A curated overview of our interior design, architectural, and spatial explorations across residential, commercial, and public environments. Each project reflects our commitment to material integrity, spatial clarity, and thoughtful craftsmanship."
           className="font-display text-2xl font-light py-10 lede-our-work"
           delay={100}
           duration={0.6}

@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import SplitText from "@/components/animations/TextReveal";
 import FadeIn from "@/components/animations/FadeIn";
+import LeadForm from "@/components/lead-form";
 
 export default function ContactPage() {
   return (
@@ -74,147 +75,7 @@ export default function ContactPage() {
             </FadeIn>
           </div>
 
-          <FadeIn className="w-full">
-            <div className="mx-auto w-full max-w-[560px] rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-sm dark:border-white/15 dark:bg-black/80 dark:shadow-[0_30px_80px_rgba(0,0,0,0.6)] md:p-10">
-              <SplitText
-                text="Lets start!"
-                className="font-sans text-3xl md:text-4xl"
-                delay={80}
-                duration={0.6}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0.2, y: 10 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.2}
-                rootMargin="-80px"
-                textAlign="left"
-                enableScrollTrigger={true}
-                tag="h2"
-                scrollTriggerConfig={{
-                  start: "top 90%",
-                  end: "bottom 10%",
-                  scrub: true,
-                  once: true,
-                  markers: false,
-                }}
-              />
-
-              <form
-                className="mt-8 space-y-4"
-                onSubmit={(event) => event.preventDefault()}
-              >
-                <div className="space-y-2">
-                  <label className="sr-only" htmlFor="full-name">
-                    Full name
-                  </label>
-                  <input
-                    id="full-name"
-                    type="text"
-                    placeholder="FULL NAME*"
-                    className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
-                  />
-                  <p className="text-xs italic text-red-500">
-                    This field is required.
-                  </p>
-                </div>
-
-                <div className="relative">
-                  <label className="sr-only" htmlFor="purpose">
-                    Purpose of contact
-                  </label>
-                  <select
-                    id="purpose"
-                    className="w-full appearance-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      PURPOSE OF CONTACT*
-                    </option>
-                    <option value="residential">Residential project</option>
-                    <option value="commercial">Commercial project</option>
-                    <option value="collaboration">Collaboration</option>
-                    <option value="other">Other inquiry</option>
-                  </select>
-                  <svg
-                    aria-hidden="true"
-                    className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-black/60 dark:text-white/60"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M4 6l4 4 4-4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div>
-                  <label className="sr-only" htmlFor="email">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="EMAIL*"
-                    className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
-                  />
-                </div>
-
-                <div>
-                  <label className="sr-only" htmlFor="phone">
-                    Phone number
-                  </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    placeholder="PHONE NUMBER*"
-                    className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
-                  />
-                </div>
-
-                <div>
-                  <label className="sr-only" htmlFor="message">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    placeholder="MESSAGE*"
-                    rows={4}
-                    className="w-full resize-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
-                  />
-                </div>
-
-                <label className="flex items-start gap-3 text-xs text-black/70 dark:text-white/70">
-                  <input
-                    type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border border-black/40 text-black dark:border-white/50 dark:text-white"
-                  />
-                  <span>
-                    I consent to Vivek Verma Architects processing my personal
-                    data in line with the{" "}
-                    <span className="font-medium text-black underline underline-offset-4 dark:text-white">
-                      privacy policy
-                    </span>{" "}
-                    and{" "}
-                    <span className="font-medium text-black underline underline-offset-4 dark:text-white">
-                      terms and conditions.
-                    </span>
-                  </span>
-                </label>
-
-                <button
-                  type="submit"
-                  className="mt-6 flex w-full items-center justify-between border-b border-black/70 pb-2 text-sm uppercase tracking-[0.3em] text-black dark:border-white/50 dark:text-white"
-                >
-                  <span>SEND</span>
-                  <span className="text-lg">→</span>
-                </button>
-              </form>
-            </div>
-          </FadeIn>
+          <LeadForm />
         </div>
       </div>
     </div>

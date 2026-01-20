@@ -65,7 +65,7 @@ const DEFAULT_RECORD: NumbersAndTestimonialsRecord = {
 
 // Env-driven PB settings so staging/prod can swap without code changes.
 const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_PB_BASE_URL ?? "https://staging.angle.services";
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? process.env.POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "numbers_and_testimonials";
 const POCKETBASE_RECORD_ID =
   process.env.NEXT_PUBLIC_PB_NUMBERS_TESTIMONIALS_ID ?? "lphz7j9p1wcglox";

@@ -62,16 +62,17 @@ export default function AboutPage() {
 
         {/* Vivek Verma */}
         <div className="mb-10">
-          <div className="width-max flex gap-10">
-            <div className="">
+          <div className="width-max flex flex-col gap-10 md:flex-row">
+            <div className="flex-1 min-w-0">
               <Image
                 src="/2.png"
                 alt="The creators"
                 width={800}
                 height={1200}
+                className="w-full h-auto"
               />
             </div>
-            <div className="block w-[50%]">
+            <div className="block flex-1 min-w-0">
               <SplitText
                 html="With more than three decades of practice, Vivek Varma has led the studio to the forefront of integrated spatial design in India. Our work spans residential, commercial, hospitality, cultural, and developer-led environments, consistently blurring the boundaries between interior space and architectural form to create cohesive, experiential narratives."
                 className="font-display text-2xl font-light py-10"
@@ -104,8 +105,8 @@ export default function AboutPage() {
 
           {/* Tanay Verma */}
 
-          <div className="width-max flex gap-10">
-            <div className="block w-[50%]">
+          <div className="width-max flex flex-col gap-10 md:flex-row">
+            <div className="block flex-1 min-w-0">
               <SplitText
                 html="With more than three decades of practice, Vivek Varma has led the studio to the forefront of integrated spatial design in India. Our work spans residential, commercial, hospitality, cultural, and developer-led environments, consistently blurring the boundaries between interior space and architectural form to create cohesive, experiential narratives."
                 className="font-display text-2xl font-light py-10"
@@ -134,12 +135,13 @@ export default function AboutPage() {
                 }}
               />
             </div>
-            <div className="">
+            <div className="flex-1 min-w-0">
               <Image
                 src="/2.png"
                 alt="The creators"
                 width={800}
                 height={1200}
+                className="w-full h-auto"
               />
             </div>
           </div>

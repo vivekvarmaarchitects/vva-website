@@ -18,7 +18,7 @@ const normalizeStringArray = (value?: string[] | string | null): string[] => {
 const resolveProjectImageUrl = (
   baseUrl: string,
   project: { collectionId: string; id: string },
-  filename?: string
+  filename?: string,
 ): string | null => {
   if (!filename) return null;
   return `${baseUrl}/api/files/${project.collectionId}/${project.id}/${filename}`;
@@ -93,7 +93,7 @@ export default function Page() {
   /**
    * PocketBase base URL
    */
-  const baseUrl = "https://staging.angle.services";
+  const baseUrl = process.env.POCKETBASE_URL ?? "";
 
   // Resolve Image_1 filenames into full PocketBase URLs.
   const imageGroupOne = useMemo(() => {
@@ -143,7 +143,7 @@ export default function Page() {
     // Encode filter so special characters don't break the URL
     // perPage=1 because we only want one matching record
     return `${baseUrl}/api/collections/project/records?filter=${encodeURIComponent(
-      filter
+      filter,
     )}&perPage=1`;
   }, [slug]);
 
@@ -252,7 +252,7 @@ export default function Page() {
   return (
     <div className=" mt-32">
       <div className="width-max">
-        <div className="font-display">
+        <div className="font-display text-s">
           <p>
             {/* TODO: make breakcrumb links Clickabele */}
             Home / Design / {project.Scope} / {project.Name}

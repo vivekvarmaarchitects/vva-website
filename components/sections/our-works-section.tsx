@@ -37,7 +37,7 @@ const ALL_TAB = "All";
 const PROJECTS_PER_PAGE = 200;
 
 const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_PB_BASE_URL ?? "https://staging.angle.services";
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? process.env.POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "project";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");

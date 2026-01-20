@@ -131,15 +131,10 @@
   @apply max-w-[1440px] mx-auto px-4 md:px-8;
 }
 
-.lede-our-work .split-word:nth-child(1),
-.lede-our-work .split-word:nth-child(2),
-.lede-our-work .split-word:nth-child(3) {
-  text-decoration-line: underline;
-  text-decoration-color: currentColor;
-  text-decoration-thickness: 0.8px;
-  text-underline-offset: 6px;
+.lede-our-work .split-word:nth-child(1) {
+  margin-left: 35%;
 }
 
-.lede-our-work .split-word:nth-child(1) {
+.lede-our-work-indent .split-word:nth-child(1) {
   margin-left: 35%;
 }

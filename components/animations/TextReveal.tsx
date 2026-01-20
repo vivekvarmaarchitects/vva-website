@@ -54,16 +54,36 @@ const SplitText: React.FC<SplitTextProps> = ({
     ref.current = node;
   };
   const animationCompletedRef = useRef(false);
-  const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
+  const [fontsLoaded, setFontsLoaded] = useState<boolean>(() => {
+    if (typeof document === "undefined") {
+      return true;
+    }
+    const fonts = document.fonts;
+    return !fonts || fonts.status === "loaded";
+  });
 
   useEffect(() => {
-    if (document.fonts.status === "loaded") {
-      setFontsLoaded(true);
-    } else {
-      document.fonts.ready.then(() => {
-        setFontsLoaded(true);
-      });
+    const fonts = document.fonts;
+    if (!fonts || fonts.status === "loaded") {
+      return;
     }
+
+    let active = true;
+    fonts.ready
+      .then(() => {
+        if (active) {
+          setFontsLoaded(true);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setFontsLoaded(true);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useGSAP(

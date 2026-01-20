@@ -7,6 +7,12 @@ import SplitText from "@/components/animations/TextReveal";
 import FadeIn from "@/components/animations/FadeIn";
 import ResultsVisionSection from "@/components/sections/results-vision-section";
 import PublicationSection from "@/components/sections/publication-section";
+import { ProjectBlock } from "@/components/sections/project-block";
+
+type FaqItem = {
+  question: string;
+  answer: string;
+};
 
 type HomepageRecord = {
   id?: string;
@@ -15,24 +21,72 @@ type HomepageRecord = {
   heading_3?: string;
   heading_4?: string;
   hero_carausel?: string[] | string;
+  hero_carausel_alt?: string[] | string | null;
   hero_text?: string;
   sub_hero_text?: string;
   intro?: string;
+  faq?: FaqItem[] | string | null;
+  schema_org?: Record<string, unknown> | string | null;
+  seo_title?: string;
+  seo_description?: string;
+  seo_image?: string;
+  logo_image?: string;
+  logo_alt?: string;
   specialization_1_title?: string;
   specialization_1_description?: string;
   specialization_1_image?: string;
+  specialization_1_image_alt?: string;
   specialization_2_title?: string;
   specialization_2_description?: string;
   specialization_2_image?: string;
+  specialization_2_image_alt?: string;
   specialization_3_title?: string;
   specialization_3_description?: string;
   specialization_3_image?: string;
+  specialization_3_image_alt?: string;
   specialization_4_title?: string;
   specialization_4_description?: string;
   specialization_4_image?: string;
+  specialization_4_image_alt?: string;
   specialization_5_title?: string;
   specialization_5_description?: string;
   specialization_5_image?: string;
+  specialization_5_image_alt?: string;
+};
+
+type PBListResponse<T> = {
+  page: number;
+  perPage: number;
+  totalPages: number;
+  totalItems: number;
+  items: T[];
+};
+
+type HomepageProjectRecord = {
+  collectionId?: string;
+  collectionName?: string;
+  id?: string;
+  index?: number | string;
+  Project_Name?: string;
+  Client_name?: string;
+  Year?: string | number;
+  Image?: string;
+  Image_alt?: string;
+  Slug?: string | string[] | null;
+};
+
+type ProjectSlugRecord = {
+  id?: string;
+  slug?: string;
+};
+
+type ProjectBlockDisplay = {
+  title: string;
+  client: string;
+  year: string;
+  imageSrc: string;
+  imageAlt: string;
+  href?: string;
 };
 
 const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
@@ -40,6 +94,7 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
   heading_3: "FEATURED <em>PROJECTS</em>",
   heading_4: "RESULTS THAT <em>MATCH YOUR VISION</em>",
   hero_carausel: ["/hero_vva.png"],
+  hero_carausel_alt: ["Vivek Varma Architects hero image"],
   hero_text: "Crafting spatial narratives grounded in human experience",
   sub_hero_text:
     "We, <u>Vivek Varma Architects</u>, are a practice rooted in interior architecture, shaping environments for those who value design, craft, and context.",
@@ -59,9 +114,11 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
   specialization_3_image: "/Space.png",
 };
 
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_PB_BASE_URL ?? "https://staging.angle.services";
+const POCKETBASE_BASE_URL = process.env.POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "homepage";
+const HOMEPAGE_PROJECTS_COLLECTION = "homepage_projects";
+const PROJECT_COLLECTION = "project";
+const HOMEPAGE_PROJECTS_PER_PAGE = 200;
 const POCKETBASE_RECORD_ID =
   process.env.NEXT_PUBLIC_PB_HOMEPAGE_ID ?? "zreceve3mfdgrh3";
 const POCKETBASE_REFRESH_MS = (() => {
@@ -94,11 +151,49 @@ const stripOuterTags = (value: string | undefined, tags: string[]) => {
   return result.trim();
 };
 
+const stripHtmlTags = (value: string | undefined) => {
+  if (!value) {
+    return "";
+  }
+  return value
+    .replace(/<br\s*\/?>(?=\s*\n)?/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .trim();
+};
+
 const normalizeStringArray = (value?: string | string[] | null) => {
   if (!value) {
     return [];
   }
   return Array.isArray(value) ? value : [value];
+};
+
+const normalizeTextArray = (value?: string | string[] | null) =>
+  normalizeStringArray(value)
+    .map((item) => (typeof item === "string" ? item : String(item)))
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const normalizeRelationId = (value?: string | string[] | null) => {
+  if (!value) {
+    return "";
+  }
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+  return value;
+};
+
+const normalizeIndexValue = (value?: number | string | null) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
 };
 
 const resolveImageUrl = (record: HomepageRecord, value?: string) => {
@@ -123,92 +218,88 @@ const resolveImageUrl = (record: HomepageRecord, value?: string) => {
   return `${normalizedBaseUrl}/api/files/${record.collectionId}/${record.id}/${encodedName}`;
 };
 
-type ProjectBlockProps = {
-  title: string;
-  client: string;
-  year: string;
-  imageSrc: string;
-  align?: "left" | "right";
-  metaPosition?: "top" | "bottom" | "left" | "right";
-  metaPositionLg?: "top" | "bottom" | "left" | "right"; // NEW
-  className?: string;
+const resolveProjectBlockImageUrl = (
+  record: HomepageProjectRecord,
+  value?: string,
+) => {
+  if (!value) {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("/")
+  ) {
+    return trimmed;
+  }
+  if (!record.collectionId || !record.id) {
+    return null;
+  }
+  const encodedName = encodeURIComponent(trimmed);
+  return `${normalizedBaseUrl}/api/files/${record.collectionId}/${record.id}/${encodedName}`;
 };
 
-const ProjectBlock = ({
-  title,
-  client,
-  year,
-  imageSrc,
-  align = "left",
-  metaPosition = "top",
-  metaPositionLg,
-  className = "",
-}: ProjectBlockProps) => {
-  // Determine final meta position based on mobile vs desktop
-  const [isDesktop, setIsDesktop] = React.useState(false);
+const parseJson = <T,>(value: unknown) => {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return null;
+    }
+  }
+  return value as T;
+};
 
-  React.useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-
-    const listener = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", listener);
-    return () => mq.removeEventListener("change", listener);
-  }, []);
-
-  const finalPosition =
-    isDesktop && metaPositionLg ? metaPositionLg : metaPosition;
-
-  const metaBlock = (
-    <div className="text-base md:text-xs uppercase tracking-wide md:tracking-[0.2em] dark:text-neutral-200 space-y-1">
-      <p>{title}</p>
-      <p>{client}</p>
-      <p>{year}</p>
-    </div>
-  );
-
-  const isVertical = finalPosition === "top" || finalPosition === "bottom";
-  const isLeft = finalPosition === "left";
-  const isRight = finalPosition === "right";
-
-  return (
-    <div
-      className={`flex ${
-        isVertical ? "flex-col" : "flex-row"
-      } gap-4 ${className}`}
-    >
-      {isLeft && metaBlock}
-
-      {finalPosition === "top" && (
-        <div className="order-first">{metaBlock}</div>
-      )}
-
-      <div className="w-full overflow-hidden rounded-md bg-neutral-900 max-h-150">
-        <Image
-          src={imageSrc}
-          alt={title}
-          width={1200}
-          height={900}
-          className="h-auto w-full object-cover"
-        />
-      </div>
-
-      {finalPosition === "bottom" && (
-        <div className="order-last">{metaBlock}</div>
-      )}
-
-      {isRight && metaBlock}
-    </div>
-  );
+const normalizeFaqItems = (value?: HomepageRecord["faq"]) => {
+  const parsed = parseJson<unknown>(value ?? null);
+  if (!parsed) {
+    return [] as FaqItem[];
+  }
+  if (!Array.isArray(parsed)) {
+    return [] as FaqItem[];
+  }
+  return parsed
+    .map((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+      const question =
+        "question" in item ? String(item.question ?? "").trim() : "";
+      const answer = "answer" in item ? String(item.answer ?? "").trim() : "";
+      if (!question || !answer) {
+        return null;
+      }
+      return { question, answer };
+    })
+    .filter((item): item is FaqItem => Boolean(item));
 };
 
 export default function HomePage() {
   const [record, setRecord] = React.useState<HomepageRecord>(
-    DEFAULT_HOMEPAGE_RECORD
+    DEFAULT_HOMEPAGE_RECORD,
   );
   const [heroIndex, setHeroIndex] = React.useState(0);
+  const [projectBlocks, setProjectBlocks] = React.useState<
+    HomepageProjectRecord[]
+  >([]);
+  const [projectSlugMap, setProjectSlugMap] = React.useState<
+    Record<string, string>
+  >({});
 
   const recordUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records/${POCKETBASE_RECORD_ID}`;
+  const homepageProjectsUrl = `${normalizedBaseUrl}/api/collections/${HOMEPAGE_PROJECTS_COLLECTION}/records?${new URLSearchParams(
+    {
+      perPage: String(HOMEPAGE_PROJECTS_PER_PAGE),
+      sort: "index",
+    },
+  ).toString()}`;
 
   const fetchRecord = React.useCallback(async () => {
     const response = await fetch(recordUrl, { cache: "no-store" });
@@ -282,7 +373,7 @@ export default function HomePage() {
           load();
           intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
         },
-        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining
+        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining,
       );
     } else {
       load();
@@ -299,6 +390,116 @@ export default function HomePage() {
     };
   }, [fetchRecord]);
 
+  React.useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+
+    const loadProjectSlugs = async (slugIds: string[]) => {
+      if (!slugIds.length) {
+        if (active) {
+          setProjectSlugMap({});
+        }
+        return;
+      }
+
+      try {
+        const results = await Promise.all(
+          slugIds.map(async (slugId) => {
+            try {
+              const response = await fetch(
+                `${normalizedBaseUrl}/api/collections/${PROJECT_COLLECTION}/records/${slugId}`,
+                { signal: controller.signal, cache: "no-store" },
+              );
+              if (!response.ok) {
+                return null;
+              }
+              const data = (await response.json()) as ProjectSlugRecord;
+              const slug = data.slug?.trim();
+              if (!slug) {
+                return null;
+              }
+              return { slugId, slug };
+            } catch (error) {
+              if (
+                typeof error === "object" &&
+                error !== null &&
+                "name" in error &&
+                (error as { name?: string }).name === "AbortError"
+              ) {
+                return null;
+              }
+              return null;
+            }
+          }),
+        );
+
+        if (!active) {
+          return;
+        }
+        const nextMap: Record<string, string> = {};
+        results.forEach((item) => {
+          if (item) {
+            nextMap[item.slugId] = item.slug;
+          }
+        });
+        setProjectSlugMap(nextMap);
+      } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "name" in error &&
+          (error as { name?: string }).name === "AbortError"
+        ) {
+          return;
+        }
+      }
+    };
+
+    const load = async () => {
+      try {
+        const response = await fetch(homepageProjectsUrl, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+        const data = (await response.json()) as PBListResponse<
+          HomepageProjectRecord
+        >;
+        const items = data.items ?? [];
+        if (!active) {
+          return;
+        }
+        setProjectBlocks(items);
+        const slugIds = Array.from(
+          new Set(
+            items
+              .map((item) => normalizeRelationId(item.Slug).trim())
+              .filter(Boolean),
+          ),
+        );
+        await loadProjectSlugs(slugIds);
+      } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "name" in error &&
+          (error as { name?: string }).name === "AbortError"
+        ) {
+          return;
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [homepageProjectsUrl]);
+
   const heroImages = React.useMemo(() => {
     const primary = normalizeStringArray(record.hero_carausel)
       .map((value) => resolveImageUrl(record, value))
@@ -309,6 +510,15 @@ export default function HomePage() {
     return normalizeStringArray(DEFAULT_HOMEPAGE_RECORD.hero_carausel)
       .map((value) => resolveImageUrl(DEFAULT_HOMEPAGE_RECORD, value))
       .filter((value): value is string => Boolean(value));
+  }, [record]);
+
+  const heroAltText = stripHtmlTags(record.hero_text) || "Hero image";
+  const heroAlts = React.useMemo(() => {
+    const primary = normalizeTextArray(record.hero_carausel_alt);
+    if (primary.length) {
+      return primary;
+    }
+    return normalizeTextArray(DEFAULT_HOMEPAGE_RECORD.hero_carausel_alt);
   }, [record]);
 
   React.useEffect(() => {
@@ -329,10 +539,34 @@ export default function HomePage() {
     "h3",
   ]);
   const subHeroHtml = stripOuterTags(record.sub_hero_text, ["h2", "p"]);
-  const introHtml = stripOuterTags(record.intro, ["p"]);
+  const introText = stripHtmlTags(record.intro);
   const heading1Html = stripOuterTags(record.heading_1, ["p"]);
   const heading3Html = stripOuterTags(record.heading_3, ["p"]);
   const heading4Html = stripOuterTags(record.heading_4, ["p"]);
+  const faqItems = React.useMemo(() => normalizeFaqItems(record.faq), [record]);
+
+  const schemaOrg = React.useMemo(
+    () => parseJson<Record<string, unknown>>(record.schema_org),
+    [record.schema_org],
+  );
+
+  const faqSchema = React.useMemo(() => {
+    if (!faqItems.length) {
+      return null;
+    }
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    };
+  }, [faqItems]);
 
   const specializations = React.useMemo(() => {
     const data = [
@@ -340,26 +574,31 @@ export default function HomePage() {
         title: record.specialization_1_title,
         description: record.specialization_1_description,
         image: record.specialization_1_image,
+        imageAlt: record.specialization_1_image_alt,
       },
       {
         title: record.specialization_2_title,
         description: record.specialization_2_description,
         image: record.specialization_2_image,
+        imageAlt: record.specialization_2_image_alt,
       },
       {
         title: record.specialization_3_title,
         description: record.specialization_3_description,
         image: record.specialization_3_image,
+        imageAlt: record.specialization_3_image_alt,
       },
       {
         title: record.specialization_4_title,
         description: record.specialization_4_description,
         image: record.specialization_4_image,
+        imageAlt: record.specialization_4_image_alt,
       },
       {
         title: record.specialization_5_title,
         description: record.specialization_5_description,
         image: record.specialization_5_image,
+        imageAlt: record.specialization_5_image_alt,
       },
     ];
 
@@ -368,6 +607,7 @@ export default function HomePage() {
         const title = item.title?.trim() ?? "";
         const description = item.description?.trim() ?? "";
         const imageUrl = resolveImageUrl(record, item.image);
+        const imageAlt = item.imageAlt?.trim() ?? "";
         const hasContent = Boolean(title || description || imageUrl);
         if (!hasContent) {
           return null;
@@ -377,13 +617,112 @@ export default function HomePage() {
           title,
           description,
           imageUrl,
+          imageAlt,
         };
       })
       .filter((item): item is NonNullable<typeof item> => Boolean(item));
   }, [record]);
 
+  const projectBlockMap = React.useMemo(() => {
+    const map = new Map<number, HomepageProjectRecord>();
+    projectBlocks.forEach((item) => {
+      const index = normalizeIndexValue(item.index);
+      if (index === null) {
+        return;
+      }
+      if (!map.has(index)) {
+        map.set(index, item);
+      }
+    });
+    return map;
+  }, [projectBlocks]);
+
+  const getProjectBlockDisplay = React.useCallback(
+    (index: number, fallback: ProjectBlockDisplay) => {
+      const record = projectBlockMap.get(index);
+      if (!record) {
+        return fallback;
+      }
+      const title = record.Project_Name?.trim() || fallback.title;
+      const client = record.Client_name?.trim() || fallback.client;
+      const yearValue =
+        record.Year !== undefined && record.Year !== null
+          ? String(record.Year).trim()
+          : "";
+      const year = yearValue || fallback.year;
+      const imageSrc =
+        resolveProjectBlockImageUrl(record, record.Image) ?? fallback.imageSrc;
+      const imageAlt =
+        record.Image_alt?.trim() ||
+        record.Project_Name?.trim() ||
+        fallback.imageAlt ||
+        fallback.title;
+      const slugId = normalizeRelationId(record.Slug).trim();
+      const slug = slugId ? projectSlugMap[slugId] ?? "" : "";
+      const href = slug ? `/design/${encodeURIComponent(slug)}` : undefined;
+
+      return {
+        title,
+        client,
+        year,
+        imageSrc,
+        imageAlt,
+        href,
+      };
+    },
+    [projectBlockMap, projectSlugMap],
+  );
+
+  const projectBlock1 = getProjectBlockDisplay(1, {
+    title: "Project Name",
+    client: "Client Name",
+    year: "2024",
+    imageSrc: "/2.png",
+    imageAlt: "Project Name",
+  });
+  const projectBlock2 = getProjectBlockDisplay(2, {
+    title: "Project Name",
+    client: "Client Name",
+    year: "2023",
+    imageSrc: "/1.png",
+    imageAlt: "Project Name",
+  });
+  const projectBlock3 = getProjectBlockDisplay(3, {
+    title: "Project Name",
+    client: "Client Name",
+    year: "2022",
+    imageSrc: "/3.png",
+    imageAlt: "Project Name",
+  });
+  const projectBlock4 = getProjectBlockDisplay(4, {
+    title: "Project Name",
+    client: "Client Name",
+    year: "2021",
+    imageSrc: "/4.png",
+    imageAlt: "Project Name",
+  });
+  const projectBlock5 = getProjectBlockDisplay(5, {
+    title: "Project Name",
+    client: "Client Name",
+    year: "2020",
+    imageSrc: "/5.png",
+    imageAlt: "Project Name",
+  });
+
   return (
     <main>
+      {schemaOrg ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
+      ) : null}
+      {faqSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      ) : null}
       <div
         className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full
 "
@@ -412,7 +751,7 @@ export default function HomePage() {
             }}
           />
           <h2
-            className=" font-display md:w-[50%]"
+            className="font-display md:w-[50%] sub-hero-text"
             dangerouslySetInnerHTML={{ __html: subHeroHtml }}
           />
         </div>
@@ -422,7 +761,7 @@ export default function HomePage() {
               <Image
                 key={`${src}-${index}`}
                 src={src}
-                alt="Hero"
+                alt={heroAlts[index] || heroAltText}
                 fill
                 sizes="100vw"
                 priority={index === 0}
@@ -438,8 +777,8 @@ export default function HomePage() {
         </div>
         <div className="width-max">
           <SplitText
-            html={introHtml}
-            className="font-display text-2xl font-light py-10 lede-our-work"
+            text={introText}
+            className="font-display text-2xl font-light py-10 lede-our-work-indent whitespace-pre-line"
             delay={100}
             duration={0.6}
             ease="power3.out"
@@ -484,11 +823,14 @@ export default function HomePage() {
               >
                 <div className="">
                   {" "}
+                  {/* Index 1 */}
                   <ProjectBlock
-                    title="Project Name"
-                    client="Client Name"
-                    year="2024"
-                    imageSrc="/2.png"
+                    title={projectBlock1.title}
+                    client={projectBlock1.client}
+                    year={projectBlock1.year}
+                    imageSrc={projectBlock1.imageSrc}
+                    imageAlt={projectBlock1.imageAlt}
+                    href={projectBlock1.href}
                     align="left"
                     className=""
                     metaPosition="bottom"
@@ -513,11 +855,14 @@ export default function HomePage() {
               >
                 <div className="sticky top-50">
                   {" "}
+                  {/* Index 2 */}
                   <ProjectBlock
-                    title="Project Name"
-                    client="Client Name"
-                    year="2023"
-                    imageSrc="/1.png"
+                    title={projectBlock2.title}
+                    client={projectBlock2.client}
+                    year={projectBlock2.year}
+                    imageSrc={projectBlock2.imageSrc}
+                    imageAlt={projectBlock2.imageAlt}
+                    href={projectBlock2.href}
                     align="right"
                     className="mt-10 lg:mt-0"
                     metaPosition="bottom"
@@ -542,11 +887,14 @@ export default function HomePage() {
               >
                 <div className="">
                   {" "}
+                  {/* Index 3 */}
                   <ProjectBlock
-                    title="Project Name"
-                    client="Client Name"
-                    year="2022"
-                    imageSrc="/3.png"
+                    title={projectBlock3.title}
+                    client={projectBlock3.client}
+                    year={projectBlock3.year}
+                    imageSrc={projectBlock3.imageSrc}
+                    imageAlt={projectBlock3.imageAlt}
+                    href={projectBlock3.href}
                     align="left"
                     className="lg:col-span-6 lg:col-start-3 mt-10 lg:mt-20"
                     metaPositionLg="left"
@@ -571,11 +919,14 @@ export default function HomePage() {
               >
                 <div className="sticky top-100">
                   {" "}
+                  {/* Index 4 */}
                   <ProjectBlock
-                    title="Project Name"
-                    client="Client Name"
-                    year="2021"
-                    imageSrc="/4.png"
+                    title={projectBlock4.title}
+                    client={projectBlock4.client}
+                    year={projectBlock4.year}
+                    imageSrc={projectBlock4.imageSrc}
+                    imageAlt={projectBlock4.imageAlt}
+                    href={projectBlock4.href}
                     align="right"
                     className="lg:col-span-4 lg:col-start-9 mt-10 lg:mt-45"
                     metaPositionLg="bottom"
@@ -600,11 +951,14 @@ export default function HomePage() {
               >
                 <div className="">
                   {" "}
+                  {/* Index 5 */}
                   <ProjectBlock
-                    title="Project Name"
-                    client="Client Name"
-                    year="2020"
-                    imageSrc="/5.png"
+                    title={projectBlock5.title}
+                    client={projectBlock5.client}
+                    year={projectBlock5.year}
+                    imageSrc={projectBlock5.imageSrc}
+                    imageAlt={projectBlock5.imageAlt}
+                    href={projectBlock5.href}
                     align="left"
                     className="lg:col-span-5 mt-10 lg:mt-20"
                     metaPositionLg="right"
@@ -628,6 +982,8 @@ export default function HomePage() {
               {specializations.map((item, index) => {
                 const displayIndex = String(index + 1).padStart(2, "0");
                 const hasImage = Boolean(item.imageUrl);
+                const imageAlt =
+                  item.imageAlt || item.title || "Specialization";
                 return (
                   <div
                     key={item.key}
@@ -661,7 +1017,7 @@ export default function HomePage() {
                         <div className="md:col-span-2">
                           <Image
                             src={item.imageUrl as string}
-                            alt={item.title || "Specialization"}
+                            alt={imageAlt}
                             width={800}
                             height={600}
                             className="w-full h-auto rounded-md object-cover"
@@ -675,6 +1031,28 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {faqItems.length ? (
+          <section className="w-full py-20">
+            <div className="width-max">
+              <h2 className="text-sm tracking-[0.35em] text-[#666766] dark:text-[#B3B4B4] uppercase mb-10">
+                FAQ
+              </h2>
+              <div className="space-y-8">
+                {faqItems.map((item, index) => (
+                  <div key={`${item.question}-${index}`}>
+                    <h3 className="text-xl font-semibold mb-2">
+                      {item.question}
+                    </h3>
+                    <p className="dark:text-white leading-relaxed">
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
         <PublicationSection />
       </div>
     </main>
