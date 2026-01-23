@@ -6,11 +6,9 @@ import { outfit, generalSans } from "@/public/fonts/fonts";
 import { ThemeProvider } from "next-themes";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { DEFAULT_SITE_METADATA } from "@/lib/seo-pages";
 
-export const metadata: Metadata = {
-  title: "Vivek Verma Architects",
-  description: "Portfolio and projects of Vivek Verma Architects.",
-};
+export const metadata: Metadata = DEFAULT_SITE_METADATA;
 
 export default function RootLayout({
   children,

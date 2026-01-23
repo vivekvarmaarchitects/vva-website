@@ -80,7 +80,7 @@ export function SiteHeader() {
           <ThemeToggleButton />
 
           <Link
-            href="/contact"
+            href="/contact-us"
             className="hidden border border-black dark:border-white px-4 py-2 text-sm md:inline-flex items-center justify-center transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
           >
             Book a call
@@ -146,7 +146,7 @@ export function SiteHeader() {
             Publications
           </Link>
           <Link
-            href="/contact"
+            href="/contact-us"
             onClick={handleCloseMenu}
             className="border-b border-black py-6 transition-opacity hover:opacity-70 dark:border-white"
           >

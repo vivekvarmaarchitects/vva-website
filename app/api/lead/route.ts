@@ -110,9 +110,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Page URL is too long" }, { status: 400 });
   }
 
-  const pocketbaseUrl = process.env.POCKETBASE_URL || "";
+  const pocketbaseUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "";
   if (!pocketbaseUrl) {
-    console.error("Lead API: POCKETBASE_URL is not configured.");
+    console.error("Lead API: NEXT_PUBLIC_POCKETBASE_URL is not configured.");
     return NextResponse.json(
       { error: "Server configuration error" },
       { status: 500 }

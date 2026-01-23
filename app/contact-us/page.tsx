@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
-import PrivacyPage from "@/components/privacy-page";
+import ContactUsPage from "@/components/contact-us-page";
 import SeoJsonLd from "@/components/seo-jsonld";
 import { getSeoJsonLd, getSeoMetadata } from "@/lib/seo-pages";
 
-const ROUTE = "/privacy";
+const ROUTE = "/contact-us";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getSeoMetadata(ROUTE);
@@ -16,7 +16,7 @@ export default async function Page() {
   return (
     <>
       <SeoJsonLd objects={jsonLd} />
-      <PrivacyPage />
+      <ContactUsPage />
     </>
   );
 }

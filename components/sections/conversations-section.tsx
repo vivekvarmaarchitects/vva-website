@@ -42,7 +42,7 @@ export default function Conversations() {
               </svg>
               <span>
                 <Link
-                  href="/contact"
+                  href="/contact-us"
                   className="underline decoration-2 underline-offset-6"
                 >
                   Let&apos;s Shape

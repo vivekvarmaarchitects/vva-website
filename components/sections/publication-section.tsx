@@ -32,7 +32,7 @@ type PBListResponse<T> = {
 const BLOGS_PER_PAGE_FETCH = 30;
 
 const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_PB_BASE_URL ?? "https://staging.angle.services";
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "https://staging.angle.services";
 const normalizedBaseUrl = POCKETBASE_BASE_URL.replace(/\/$/, "");
 
 const getFileName = (value?: string | string[]) => {

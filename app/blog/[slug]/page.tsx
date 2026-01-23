@@ -79,7 +79,7 @@ export default function Page() {
   const [err, setErr] = useState<string | null>(null);
   const [hasFetched, setHasFetched] = useState(false);
 
-  const baseUrl = process.env.POCKETBASE_URL ?? "";
+  const baseUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 
   const heroImageUrl = useMemo(() => {
     if (!post) return null;

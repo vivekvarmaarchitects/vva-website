@@ -1,58 +1,11 @@
-"use client";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import Image from "next/image";
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams, notFound } from "next/navigation";
-
-// Animation components
-import SplitText from "@/components/animations/TextReveal";
-import FadeIn from "@/components/animations/FadeIn";
-
-import Conversations from "@/components/sections/conversations-section";
-
-const normalizeStringArray = (value?: string[] | string | null): string[] => {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-};
-
-const resolveProjectImageUrl = (
-  baseUrl: string,
-  project: { collectionId: string; id: string },
-  filename?: string,
-): string | null => {
-  if (!filename) return null;
-  return `${baseUrl}/api/files/${project.collectionId}/${project.id}/${filename}`;
-};
-
-/**
- * This describes ONE PocketBase "project" record (one item inside items[])
- * These names match exactly what your PocketBase returns: Name, Intro, slug, etc.
- */
-type ProjectRecord = {
-  collectionId: string;
-  collectionName: string;
-  id: string;
-  slug: string;
-  Name: string;
-  Intro: string;
-  seo_title?: string;
-  seo_description?: string;
-  // you said seo_image is a single filename string in your JSON
-  seo_image?: string;
-  featured?: boolean;
-  arc_window?: boolean;
-  Location?: string;
-  Sector?: string;
-  Year?: string;
-  Scope?: string;
-  // arrays of filenames
-  Image_1?: string[] | string;
-  Image_2?: string[];
-  Title_1?: string;
-  field_1?: string;
-  created?: string;
-  updated?: string;
-};
+import DesignProjectPage from "@/components/design-project-page";
+import SeoJsonLd from "@/components/seo-jsonld";
+import { DEFAULT_SITE_METADATA } from "@/lib/seo-pages";
+import type { ProjectRecord } from "@/lib/project-types";
 
 /**
  * PocketBase list endpoint returns an object like:
@@ -68,297 +21,426 @@ type PBListResponse<T> = {
   items: T[];
 };
 
-export default function Page() {
-  /**
-   * Reads the dynamic route param from /projects/[slug]
-   * Example URL: /projects/gaudi-bunglow
-   * slug becomes: "gaudi-bunglow"
-   */
-  const params = useParams<{ slug: string }>();
-  const slug = params?.slug;
+type PageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
-  /**
-   * Local component state:
-   * - project: the fetched project record (or null if not found)
-   * - loading: whether we are currently fetching
-   * - err: error message if something fails
-   */
-  const [project, setProject] = useState<ProjectRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState(false);
-  // Carousel index for Image_1 slides.
-  const [imageOneIndex, setImageOneIndex] = useState(0);
+const POCKETBASE_BASE_URL =
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const PROJECT_COLLECTION = "project";
 
-  /**
-   * PocketBase base URL
-   */
-  const baseUrl = process.env.POCKETBASE_URL ?? "";
+const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
 
-  // Resolve Image_1 filenames into full PocketBase URLs.
-  const imageGroupOne = useMemo(() => {
-    if (!project) {
-      return [];
+const normalizeStringArray = (value?: string[] | string | null): string[] => {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+};
+
+const normalizeSpaces = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const isNonEmptyString = (value?: string | null): value is string =>
+  typeof value === "string" && value.trim().length > 0;
+
+const safeTrim = (value?: string | null) =>
+  typeof value === "string" ? value.trim() : "";
+
+const toKebabCase = (value?: string | null) => {
+  if (!value) return "";
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
+
+const getSiteUrl = () => {
+  const fromEnv =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.SITE_URL ??
+    process.env.VERCEL_URL;
+  if (!fromEnv) return "http://localhost:3000";
+  if (fromEnv.startsWith("http://") || fromEnv.startsWith("https://")) {
+    return fromEnv;
+  }
+  return `https://${fromEnv}`;
+};
+
+const resolveProjectImageUrl = (
+  baseUrl: string,
+  project: { collectionId: string; id: string },
+  filename?: string,
+): string | null => {
+  if (!isNonEmptyString(filename)) return null;
+  const trimmed = filename.trim();
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("/")
+  ) {
+    return trimmed;
+  }
+  if (!baseUrl) return null;
+  const encodedName = encodeURIComponent(trimmed);
+  return `${baseUrl}/api/files/${project.collectionId}/${project.id}/${encodedName}`;
+};
+
+const resolveSeoImageUrl = (
+  project: { collectionId: string; id: string },
+  filename: string | undefined,
+  siteUrl: string,
+  baseUrl: string,
+) => {
+  if (!isNonEmptyString(filename)) return null;
+  const trimmed = filename.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("/")) {
+    return new URL(trimmed, siteUrl).toString();
+  }
+  return resolveProjectImageUrl(baseUrl, project, trimmed);
+};
+
+const trimDescription = (value?: string | null, maxLength = 160) => {
+  if (!isNonEmptyString(value)) return "";
+  const normalized = normalizeSpaces(value);
+  if (normalized.length <= maxLength) return normalized;
+  const clipped = normalized.slice(0, maxLength);
+  const lastSpace = clipped.lastIndexOf(" ");
+  if (lastSpace > 80) {
+    return clipped.slice(0, lastSpace).trim();
+  }
+  return clipped.trim();
+};
+
+const buildSeoTitle = (
+  project: ProjectRecord,
+  locationLabel: string,
+  brand: string,
+) => {
+  const name = safeTrim(project.Name);
+  const scope = safeTrim(project.Scope);
+  let title = name;
+  if (scope) {
+    title = title ? `${title} - ${scope}` : scope;
+  }
+  if (locationLabel) {
+    title = title ? `${title} in ${locationLabel}` : locationLabel;
+  }
+  if (brand) {
+    title = title ? `${title} | ${brand}` : brand;
+  }
+  return title;
+};
+
+const getLocationTokens = (project: ProjectRecord) => {
+  const locality = safeTrim(project.location_json?.location?.locality);
+  const city = safeTrim(project.location_json?.location?.city);
+  const state = safeTrim(project.location_json?.location?.state);
+  const country = safeTrim(project.location_json?.location?.country);
+  const fallbackParts = safeTrim(project.Location)
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const labelParts = [locality, city].filter(Boolean);
+  const label = labelParts.length ? labelParts.join(", ") : fallbackParts.join(", ");
+  const keywordParts = [locality, city, state].filter(Boolean);
+  const keywords = keywordParts.length ? keywordParts : fallbackParts;
+  return { locality, city, state, country, label, keywords };
+};
+
+const extractAltArray = (value: unknown, key: string) => {
+  if (!value) return [] as string[];
+  if (Array.isArray(value)) {
+    return value.filter(isNonEmptyString).map((item) => item.trim());
+  }
+  if (typeof value === "object" && value !== null) {
+    const candidate = (value as Record<string, unknown>)[key];
+    if (Array.isArray(candidate)) {
+      return candidate.filter(isNonEmptyString).map((item) => item.trim());
     }
-    return normalizeStringArray(project.Image_1)
-      .map((filename) => resolveProjectImageUrl(baseUrl, project, filename))
-      .filter((value): value is string => Boolean(value));
-  }, [project, baseUrl]);
+  }
+  return [] as string[];
+};
 
-  const imageGroupTwo = useMemo(() => {
-    if (!project) {
-      return [];
+const buildAltList = (
+  imageUrls: string[],
+  altSource: string[],
+  fallbackBase: string,
+) => {
+  const base = isNonEmptyString(fallbackBase) ? fallbackBase : "Project image";
+  return imageUrls.map((_, index) => {
+    const alt = altSource[index];
+    if (isNonEmptyString(alt)) return alt.trim();
+    const suffix = imageUrls.length > 1 ? ` image ${index + 1}` : "";
+    return `${base}${suffix}`.trim();
+  });
+};
+
+const buildKeywords = (project: ProjectRecord, locationKeywords: string[]) => {
+  const items = [
+    safeTrim(project.Scope),
+    safeTrim(project.Sector),
+    ...locationKeywords.map((item) => item.trim()),
+    safeTrim(project.Year),
+  ].filter(Boolean);
+  return Array.from(new Set(items));
+};
+
+const buildImageAltBase = (project: ProjectRecord, locationLabel: string) => {
+  const name = safeTrim(project.Name);
+  const sector = safeTrim(project.Sector);
+  const parts = [name, sector].filter(Boolean);
+  let base = parts.join(" ");
+  if (locationLabel) {
+    base = base ? `${base} in ${locationLabel}` : locationLabel;
+  }
+  return base;
+};
+
+const fetchProjectBySlug = cache(async (slug: string) => {
+  const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);
+  if (!normalizedBaseUrl || !slug) {
+    return null as ProjectRecord | null;
+  }
+
+  const safeSlug = String(slug).replace(/'/g, "\\'");
+  const filter = `(slug='${safeSlug}')`;
+  const params = new URLSearchParams({
+    filter,
+    perPage: "1",
+  });
+
+  try {
+    const response = await fetch(
+      `${normalizedBaseUrl}/api/collections/${PROJECT_COLLECTION}/records?${params.toString()}`,
+      process.env.NODE_ENV === "development"
+        ? { cache: "no-store" }
+        : { next: { revalidate: 300 } },
+    );
+    if (!response.ok) {
+      return null as ProjectRecord | null;
     }
-    return normalizeStringArray(project.Image_2)
-      .map((filename) => resolveProjectImageUrl(baseUrl, project, filename))
-      .filter((value): value is string => Boolean(value));
-  }, [project, baseUrl]);
+    const data = (await response.json()) as PBListResponse<ProjectRecord>;
+    return data.items?.[0] ?? null;
+  } catch {
+    return null as ProjectRecord | null;
+  }
+});
 
-  // Reset + auto-advance Image_1 carousel when its image set changes.
-  useEffect(() => {
-    setImageOneIndex(0);
-    if (imageGroupOne.length <= 1) {
-      return;
-    }
-    const intervalId = window.setInterval(() => {
-      setImageOneIndex((prev) => (prev + 1) % imageGroupOne.length);
-    }, 5000);
-    return () => window.clearInterval(intervalId);
-  }, [imageGroupOne]);
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await fetchProjectBySlug(slug);
+  if (!project) {
+    return DEFAULT_SITE_METADATA;
+  }
 
-  /**
-   * Build the API endpoint ONLY when slug changes.
-   * useMemo prevents re-creating the URL on every re-render.
-   */
-  const endpoint = useMemo(() => {
-    // If slug isn't ready yet, don't build an endpoint
-    if (!slug) return null;
+  const siteUrl = getSiteUrl();
+  const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);
+  const locationTokens = getLocationTokens(project);
+  const brand =
+    typeof DEFAULT_SITE_METADATA.title === "string"
+      ? DEFAULT_SITE_METADATA.title
+      : "";
+  const derivedSlug = toKebabCase(project.Name);
+  const canonicalSlug = derivedSlug || safeTrim(project.slug) || slug;
+  const canonicalUrl = new URL(
+    `/design/${encodeURIComponent(canonicalSlug)}`,
+    siteUrl,
+  ).toString();
 
-    // Escape single quotes in slug to avoid breaking PocketBase filter string
-    const safeSlug = String(slug).replace(/'/g, "\\'");
+  const seoTitle = isNonEmptyString(project.seo_title)
+    ? project.seo_title.trim()
+    : buildSeoTitle(project, locationTokens.label, brand);
+  const seoDescription = isNonEmptyString(project.seo_description)
+    ? project.seo_description.trim()
+    : trimDescription(project.Intro);
 
-    // PocketBase filter format
-    const filter = `(slug='${safeSlug}')`;
+  const fallbackDescription =
+    typeof DEFAULT_SITE_METADATA.description === "string"
+      ? DEFAULT_SITE_METADATA.description
+      : "";
+  const description = seoDescription || fallbackDescription;
 
-    // Encode filter so special characters don't break the URL
-    // perPage=1 because we only want one matching record
-    return `${baseUrl}/api/collections/project/records?filter=${encodeURIComponent(
-      filter,
-    )}&perPage=1`;
-  }, [slug]);
+  const seoImageUrl = resolveSeoImageUrl(
+    project,
+    project.seo_image,
+    siteUrl,
+    normalizedBaseUrl,
+  );
+  const seoImageAlt = isNonEmptyString(project.seo_image_alt)
+    ? project.seo_image_alt.trim()
+    : undefined;
+  const keywords = buildKeywords(project, locationTokens.keywords);
 
-  /**
-   * Fetch data whenever endpoint changes.
-   * This runs when you open the page and when you navigate to a different slug.
-   */
-  useEffect(() => {
-    // If endpoint is null (slug missing), don't fetch
-    if (!endpoint) return;
+  return {
+    title: seoTitle,
+    description,
+    alternates: { canonical: canonicalUrl },
+    keywords: keywords.length ? keywords : undefined,
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: seoTitle,
+      description,
+      url: canonicalUrl,
+      type: "website",
+      images: seoImageUrl
+        ? [
+            {
+              url: seoImageUrl,
+              ...(seoImageAlt ? { alt: seoImageAlt } : {}),
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description,
+      images: seoImageUrl ? [seoImageUrl] : undefined,
+    },
+  };
+}
 
-    // Lets us cancel the request if the component unmounts (navigation)
-    const controller = new AbortController();
+const buildJsonLd = (
+  project: ProjectRecord,
+  seoDescription: string,
+  seoImageUrl: string | null,
+  canonicalUrl: string,
+  locationTokens: ReturnType<typeof getLocationTokens>,
+  keywords: string[],
+) => {
+  const name = safeTrim(project.Name);
+  const scope = safeTrim(project.Scope);
+  const sector = safeTrim(project.Sector);
+  const about = [scope, sector].filter(Boolean);
+  const year = safeTrim(project.Year);
+  const dateCreated = /^\d{4}$/.test(year) ? year : "";
+  const locationLabel =
+    locationTokens.label || safeTrim(project.Location) || "";
 
-    (async () => {
-      try {
-        // Start loading UI and clear old error
-        setLoading(true);
-        setErr(null);
+  const address: Record<string, string> = {};
+  if (locationTokens.city) {
+    address.addressLocality = locationTokens.city;
+  } else if (locationTokens.locality) {
+    address.addressLocality = locationTokens.locality;
+  }
+  if (
+    locationTokens.locality &&
+    locationTokens.locality !== locationTokens.city
+  ) {
+    address.streetAddress = locationTokens.locality;
+  }
+  if (locationTokens.state) {
+    address.addressRegion = locationTokens.state;
+  }
+  if (locationTokens.country) {
+    address.addressCountry = locationTokens.country;
+  }
 
-        // Fetch project record from PocketBase
-        const res = await fetch(endpoint, {
-          signal: controller.signal, // allows abort
-          cache: "no-store", // don't cache while developing
-        });
-
-        // If response is 404/500/etc, throw so catch handles it
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-        // Convert response JSON into typed PocketBase list response
-        const data: PBListResponse<ProjectRecord> = await res.json();
-
-        // PocketBase returns array "items" even if only one matches
-        const first = data.items?.[0] ?? null;
-
-        // Save into state (triggers re-render)
-        setProject(first);
-      } catch (e: unknown) {
-        /**
-         * If we aborted the request (navigation/unmount),
-         * the browser throws an error with name "AbortError".
-         * We ignore it.
-         */
-        if (
-          typeof e === "object" &&
-          e !== null &&
-          "name" in e &&
-          (e as { name?: unknown }).name === "AbortError"
-        ) {
-          return;
+  const contentLocation =
+    locationLabel || Object.keys(address).length
+      ? {
+          "@type": "Place",
+          ...(locationLabel ? { name: locationLabel } : {}),
+          ...(Object.keys(address).length
+            ? {
+                address: {
+                  "@type": "PostalAddress",
+                  ...address,
+                },
+              }
+            : {}),
         }
+      : null;
 
-        // Normal errors: show message if it's a real Error object
-        if (e instanceof Error) {
-          setErr(e.message);
-        } else {
-          setErr("Something went wrong");
-        }
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    ...(name ? { name } : {}),
+    ...(seoDescription ? { description: seoDescription } : {}),
+    ...(seoImageUrl ? { image: [seoImageUrl] } : {}),
+    ...(canonicalUrl ? { url: canonicalUrl } : {}),
+    ...(dateCreated ? { dateCreated } : {}),
+    ...(about.length ? { about } : {}),
+    ...(keywords.length ? { keywords: keywords.join(", ") } : {}),
+    ...(contentLocation ? { contentLocation } : {}),
+  } as Record<string, unknown>;
+};
 
-        // Reset project in case previous slug had data
-        setProject(null);
-      } finally {
-        if (!controller.signal.aborted) {
-          // Stop loading UI no matter what (success or error)
-          setLoading(false);
-          setHasFetched(true);
-        }
-      }
-    })();
-
-    // Cleanup: abort fetch if user navigates away before it finishes
-    return () => controller.abort();
-  }, [endpoint]);
-
-  /**
-   * If we're done loading, and we have no project and no error,
-   * it means the slug didn't match anything => show 404 page.
-   */
-  if (hasFetched && !loading && !project && !err) {
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
+  const project = await fetchProjectBySlug(slug);
+  if (!project) {
     notFound();
   }
 
-  // Loading skeleton UI
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto p-6 mt-16">
-        <div className="h-8 w-64 rounded bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
-        <div className="mt-4 h-24 w-full rounded bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
-      </div>
-    );
-  }
+  const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);
+  const siteUrl = getSiteUrl();
+  const locationTokens = getLocationTokens(project);
+  const derivedSlug = toKebabCase(project.Name);
+  const canonicalSlug = derivedSlug || safeTrim(project.slug) || slug;
+  const canonicalUrl = new URL(
+    `/design/${encodeURIComponent(canonicalSlug)}`,
+    siteUrl,
+  ).toString();
 
-  // Error UI
-  if (err) {
-    return (
-      <div className="max-w-5xl mx-auto p-6 mt-16">
-        <p className="text-red-600 dark:text-red-400">Error: {err}</p>
-      </div>
-    );
-  }
+  const seoDescription = isNonEmptyString(project.seo_description)
+    ? project.seo_description.trim()
+    : trimDescription(project.Intro);
+  const fallbackDescription =
+    typeof DEFAULT_SITE_METADATA.description === "string"
+      ? DEFAULT_SITE_METADATA.description
+      : "";
+  const description = seoDescription || fallbackDescription;
 
-  // Should rarely happen, but keeps TS happy
-  if (!project) return null;
+  const seoImageUrl = resolveSeoImageUrl(
+    project,
+    project.seo_image,
+    siteUrl,
+    normalizedBaseUrl,
+  );
 
-  // Main UI
+  const imageGroupOne = normalizeStringArray(project.Image_1)
+    .map((filename) =>
+      resolveProjectImageUrl(normalizedBaseUrl, project, filename),
+    )
+    .filter((value): value is string => Boolean(value));
+  const imageGroupTwo = normalizeStringArray(project.Image_2)
+    .map((filename) =>
+      resolveProjectImageUrl(normalizedBaseUrl, project, filename),
+    )
+    .filter((value): value is string => Boolean(value));
+
+  const imageOneAltSource = extractAltArray(project.image_1_alt, "image_1_alt");
+  const imageTwoAltSource = extractAltArray(project.image_2_alt, "image_2_alt");
+  const altBase = buildImageAltBase(project, locationTokens.label);
+  const imageOneAlt = buildAltList(imageGroupOne, imageOneAltSource, altBase);
+  const imageTwoAlt = buildAltList(imageGroupTwo, imageTwoAltSource, altBase);
+
+  const keywords = buildKeywords(project, locationTokens.keywords);
+  const jsonLd = buildJsonLd(
+    project,
+    description,
+    seoImageUrl,
+    canonicalUrl,
+    locationTokens,
+    keywords,
+  );
+
   return (
-    <div className=" mt-32">
-      <div className="width-max">
-        <div className="font-display text-s">
-          <p>
-            {/* TODO: make breakcrumb links Clickabele */}
-            Home / Design / {project.Scope} / {project.Name}
-          </p>
-        </div>
-
-        <div className="mt-8">
-          <SplitText
-            html={project.Name}
-            className="flex font-sans text-5xl font-regular"
-            delay={100}
-            duration={0.6}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0.2, y: 0 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="left"
-            enableScrollTrigger={true}
-            tag="h1"
-            scrollTriggerConfig={{
-              start: "top",
-              end: "bottom 10%",
-              scrub: true,
-              once: true,
-              markers: false,
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-10 md:flex-row md:gap-16 font-display font-light">
-          {/* Intro */}
-          <p className=" mt-8 md:mb-16 w-full md:w-3/5 text-base md:text-lg dark:text-white">
-            {project.Intro}
-          </p>
-
-          {/* Meta table */}
-          <div className="w-full md:w-2/5 md:mt-8">
-            <div className="border-t border-neutral-300">
-              {[
-                ["LOCATION", project.Location],
-                ["SECTOR", project.Sector],
-                ["YEAR", project.Year],
-                ["SCOPE", project.Scope],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="grid grid-cols-[220px_1fr] items-center gap-6 border-b border-neutral-300 py-3"
-                >
-                  <div className="text-xs font-medium tracking-wider dark:text-white">
-                    {label}
-                  </div>
-                  <div className="text-sm dark:text-white text-left">
-                    {value || "—"}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Image 1 */}
-      <div className="relative h-[480px] md:h-[640px] overflow-hidden  md:my-16">
-        {/* Image_1 carousel; only the active slide fades in. */}
-        {imageGroupOne.map((src, index) => (
-          <Image
-            key={`${src}-${index}`}
-            src={src}
-            alt={`${project.Name} image ${index + 1}`}
-            fill
-            sizes="100vw"
-            priority={index === 0}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-              index === imageOneIndex ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Title 1 */}
-      <div className="width-max md:my-16">
-        <p className="common-heading mb-10 md:my-16 text-center md:text-left">
-          {project.Title_1}
-        </p>
-        <p className="font-display text-xl font-light">{project.field_1}</p>
-      </div>
-
-      {/* Image 2 */}
-      <div className="relative h-[480px] md:h-[640px] overflow-hidden md:my-16">
-        {/* Image_2 carousel; only the active slide fades in. */}
-        {imageGroupTwo.map((src, index) => (
-          <Image
-            key={`${src}-${index}`}
-            src={src}
-            alt={`${project.Name} image ${index + 1}`}
-            fill
-            sizes="100vw"
-            priority={index === 0}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-              index === imageOneIndex ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        ))}
-      </div>
-      <Conversations />
-    </div>
+    <>
+      <SeoJsonLd objects={jsonLd ? [jsonLd] : []} />
+      <DesignProjectPage
+        project={project}
+        imageGroupOne={imageGroupOne}
+        imageGroupTwo={imageGroupTwo}
+        imageOneAlt={imageOneAlt}
+        imageTwoAlt={imageTwoAlt}
+      />
+    </>
   );
 }

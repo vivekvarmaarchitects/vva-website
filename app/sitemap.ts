@@ -1,7 +1,8 @@
+// todo: sitemap to include project and blog records from pocketbase regardless of featured status
+
 import type { MetadataRoute } from "next";
 
-const POCKETBASE_BASE_URL =
-  process.env.POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 
 const MAX_PER_PAGE = 200;
 
@@ -19,6 +20,17 @@ const getSiteUrl = () => {
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
 
+const toKebabCase = (value?: string | null) => {
+  if (!value) return "";
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
+
+const RECENT_DAYS = 90;
+const RECENT_WINDOW_MS = RECENT_DAYS * 24 * 60 * 60 * 1000;
+
 type PBListResponse<T> = {
   page: number;
   perPage: number;
@@ -29,6 +41,7 @@ type PBListResponse<T> = {
 
 type ProjectRecord = {
   slug?: string;
+  Name?: string;
   updated?: string;
   created?: string;
   featured?: boolean;
@@ -47,6 +60,11 @@ const getLastModified = (value?: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return undefined;
   return date;
+};
+
+const isRecent = (value?: Date) => {
+  if (!value) return false;
+  return Date.now() - value.getTime() <= RECENT_WINDOW_MS;
 };
 
 const fetchAllRecords = async <T>(
@@ -104,7 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: toUrl("/contact"),
+      url: toUrl("/contact-us"),
       changeFrequency: "monthly",
       priority: 0.7,
     },
@@ -124,10 +142,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let blogRecords: BlogRecord[] = [];
 
   try {
-    projectRecords = await fetchAllRecords<ProjectRecord>(
-      "project",
-      "featured=true",
-    );
+    projectRecords = await fetchAllRecords<ProjectRecord>("project");
   } catch {
     projectRecords = [];
   }
@@ -143,15 +158,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const projectRoutes: MetadataRoute.Sitemap = projectRecords.flatMap(
     (project) => {
-      const slug = project.slug?.trim();
+      const derivedSlug = toKebabCase(project.Name?.trim());
+      const slug = derivedSlug || project.slug?.trim();
       if (!slug) return [];
       const lastModified = getLastModified(project.updated ?? project.created);
+      const recent = isRecent(lastModified);
+      const priority = project.featured ? 0.8 : 0.6;
+      const changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] =
+        recent ? "weekly" : "monthly";
       return [
         {
           url: toUrl(`/design/${encodeURIComponent(slug)}`),
           lastModified,
-          changeFrequency: "monthly" as const,
-          priority: 0.7,
+          changeFrequency,
+          priority,
         },
       ];
     },

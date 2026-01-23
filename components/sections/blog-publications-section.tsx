@@ -49,7 +49,7 @@ const PAGE_SIZE_OPTIONS = [
 const BLOGS_PER_PAGE_FETCH = 200;
 
 const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? process.env.POCKETBASE_URL ?? "";
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const normalizedBaseUrl = POCKETBASE_BASE_URL.replace(/\/$/, "");
 
 const getFileName = (value?: string | string[]) => {

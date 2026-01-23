@@ -1,13 +1,22 @@
-"use client";
+import type { Metadata } from "next";
 
-import BlogPublicationsSection from "@/components/sections/blog-publications-section";
-import Conversations from "@/components/sections/conversations-section";
+import BlogPage from "@/components/blog-page";
+import SeoJsonLd from "@/components/seo-jsonld";
+import { getSeoJsonLd, getSeoMetadata } from "@/lib/seo-pages";
 
-export default function BlogPage() {
+const ROUTE = "/blog";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getSeoMetadata(ROUTE);
+}
+
+export default async function Page() {
+  const jsonLd = await getSeoJsonLd(ROUTE);
+
   return (
-    <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white transition-all duration-300">
-      <BlogPublicationsSection />
-      <Conversations />
-    </main>
+    <>
+      <SeoJsonLd objects={jsonLd} />
+      <BlogPage />
+    </>
   );
 }

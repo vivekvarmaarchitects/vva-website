@@ -21,7 +21,7 @@ export function SiteFooter() {
         <div className="flex flex-col md:flex-row align-top h-full mb-10 md:mr-10">
           <div>
             <Link
-              href="/contact"
+              href="/contact-us"
               className="flex horizontal items-center w-full min-w-[350px] justify-between align-center transition-opacity hover:opacity-70"
               aria-label="Contact us"
             >
@@ -66,7 +66,7 @@ export function SiteFooter() {
             <Link href="/about" className={footerLinkClass}>
               ABOUT
             </Link>
-            <Link href="/contact" className={footerLinkClass}>
+            <Link href="/contact-us" className={footerLinkClass}>
               BOOK A CALL
             </Link>
           </div>

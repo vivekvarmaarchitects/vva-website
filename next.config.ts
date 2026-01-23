@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const pocketbaseUrl =
-  process.env.POCKETBASE_URL ?? process.env.NEXT_PUBLIC_POCKETBASE_URL;
+  process.env.NEXT_PUBLIC_POCKETBASE_URL;
 let pocketbaseHost = "localhost";
 let pocketbaseProtocol: "http" | "https" = "https";
 
@@ -18,7 +18,7 @@ if (pocketbaseUrl) {
 const nextConfig: NextConfig = {
   devIndicators: false,
   env: {
-    POCKETBASE_URL: pocketbaseUrl ?? "",
+    NEXT_PUBLIC_POCKETBASE_URL: pocketbaseUrl ?? "",
   },
   images: {
     remotePatterns: pocketbaseUrl
