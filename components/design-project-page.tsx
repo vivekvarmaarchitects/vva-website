@@ -62,8 +62,8 @@ export default function DesignProjectPage({
 }: DesignProjectPageProps) {
   const scopeLabel = project.Scope?.trim() || "Project";
   const nameLabel = project.Name?.trim() || "Project";
-  const imageOneKey = imageGroupOne.join("|");
-  const imageTwoKey = imageGroupTwo.join("|");
+  const imageOneKey = imageGroupOne.join("|") || "group-one";
+  const imageTwoKey = imageGroupTwo.join("|") || "group-two";
 
   return (
     <div className=" mt-32">
@@ -133,7 +133,7 @@ export default function DesignProjectPage({
 
       {/* Image 1 */}
       <ImageCarousel
-        key={imageOneKey}
+        key={`image-group-one-${imageOneKey}`}
         images={imageGroupOne}
         alts={imageOneAlt}
         nameLabel={nameLabel}
@@ -149,7 +149,7 @@ export default function DesignProjectPage({
 
       {/* Image 2 */}
       <ImageCarousel
-        key={imageTwoKey}
+        key={`image-group-two-${imageTwoKey}`}
         images={imageGroupTwo}
         alts={imageTwoAlt}
         nameLabel={nameLabel}

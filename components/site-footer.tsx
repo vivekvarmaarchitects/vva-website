@@ -25,7 +25,7 @@ export function SiteFooter() {
               className="flex horizontal items-center w-full min-w-[350px] justify-between align-center transition-opacity hover:opacity-70"
               aria-label="Contact us"
             >
-              <h2 className="text-xl tracking-wider">CONTACT US</h2>
+              <span className="text-xl tracking-wider">CONTACT US</span>
               <svg
                 width="50"
                 height="20"

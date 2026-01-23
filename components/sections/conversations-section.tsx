@@ -6,7 +6,7 @@ export default function Conversations() {
   return (
     <section className="width-max block py-24 gap-10">
       <div className="font-sans font-light text-5xl w-full md:pl-8">
-        <h1>
+        <h3>
           <span className="block md:pl-24">
             <span className="inline-flex items-center">
               <svg
@@ -52,7 +52,7 @@ export default function Conversations() {
             </span>
           </span>
           <span className="block">meaningful together.</span>
-        </h1>
+        </h3>
       </div>
 
       {/* Right paragraph */}

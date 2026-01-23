@@ -51,13 +51,15 @@ type BlogRecord = {
   slug?: string;
   updated?: string;
   created?: string;
+  publish_date?: string;
   published?: boolean;
   featured?: boolean;
 };
 
 const getLastModified = (value?: string) => {
   if (!value) return undefined;
-  const date = new Date(value);
+  const normalized = value.includes("T") ? value : value.replace(" ", "T");
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) return undefined;
   return date;
 };
@@ -148,10 +150,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    blogRecords = await fetchAllRecords<BlogRecord>(
-      "blog",
-      "published=true && featured=true",
-    );
+    blogRecords = await fetchAllRecords<BlogRecord>("blog", "published=true");
   } catch {
     blogRecords = [];
   }
@@ -180,13 +179,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogRoutes: MetadataRoute.Sitemap = blogRecords.flatMap((post) => {
     const slug = post.slug?.trim();
     if (!slug) return [];
-    const lastModified = getLastModified(post.updated ?? post.created);
+    const lastModified = getLastModified(
+      post.updated ?? post.publish_date ?? post.created,
+    );
+    const priority = post.featured ? 0.8 : 0.6;
+    const changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] =
+      post.featured ? "weekly" : "monthly";
     return [
       {
         url: toUrl(`/blog/${encodeURIComponent(slug)}`),
         lastModified,
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
+        changeFrequency,
+        priority,
       },
     ];
   });

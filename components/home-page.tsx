@@ -763,7 +763,7 @@ export default function HomePage() {
           />
         </div>
         <div className="border-b dark:border-color-[#B3B4B4]"></div>
-        <p
+        <h2
           className="width-max common-heading mb-10 md:my-12 text-center md:text-left"
           dangerouslySetInnerHTML={{ __html: heading3Html }}
         />

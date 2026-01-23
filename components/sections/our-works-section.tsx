@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
+import FadeIn from "@/components/animations/FadeIn";
 
 type ProjectRecord = {
   collectionId?: string;
@@ -310,12 +311,18 @@ export default function OurWorksSection() {
               {filteredProjects.map((project, index) => {
                 const imageUrl = resolveProjectImageUrl(project) ?? "/1.png";
                 return (
-                  <ProjectCard
+                  <FadeIn
                     key={project.id ?? project.slug ?? index}
-                    project={project}
-                    imageUrl={imageUrl}
-                    priority={index < 3}
-                  />
+                    className="h-full"
+                    distance={0}
+                    delay={index * 0.08}
+                  >
+                    <ProjectCard
+                      project={project}
+                      imageUrl={imageUrl}
+                      priority={index < 3}
+                    />
+                  </FadeIn>
                 );
               })}
             </div>

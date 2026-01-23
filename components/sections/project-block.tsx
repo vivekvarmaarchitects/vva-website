@@ -44,7 +44,7 @@ export const ProjectBlock = ({
 
   const metaBlock = (
     <div className="text-base md:text-xs uppercase tracking-wide md:tracking-[0.2em] dark:text-neutral-200 space-y-1">
-      <p>{title}</p>
+      <h3>{title}</h3>
       <p>{client}</p>
       <p>{year}</p>
     </div>

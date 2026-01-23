@@ -28,11 +28,8 @@ export default function ContactPage() {
               <p className="font-display text-base leading-relaxed text-black/80 dark:text-white/70 md:text-lg">
                 <span className="text-black dark:text-white">
                   We take on a limited number of projects each year to ensure
-                  focus and design integrity.
-                </span>{" "}
-                <span className="text-black/40 dark:text-white/40">
-                  This introductory conversation helps us understand your
-                  vision, context, and expectations.
+                  focus and design integrity. This introductory conversation
+                  helps us understand your vision, context, and expectations.
                 </span>
               </p>
             </FadeIn>
@@ -44,7 +41,7 @@ export default function ContactPage() {
               duration={0.7}
               ease="power3.out"
               splitType="chars"
-              from={{ opacity: 0.2, y: 10 }}
+              from={{ opacity: 0.2, y: 0 }}
               to={{ opacity: 1, y: 0 }}
               threshold={0.1}
               rootMargin="-120px"
@@ -52,11 +49,11 @@ export default function ContactPage() {
               enableScrollTrigger={true}
               tag="h1"
               scrollTriggerConfig={{
-                start: "top 85%",
+                start: "top 30%",
                 end: "bottom 10%",
                 scrub: true,
                 once: true,
-                markers: false,
+                markers: true,
               }}
             />
 

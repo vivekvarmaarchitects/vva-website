@@ -6,6 +6,7 @@ import SplitText from "@/components/animations/TextReveal";
 import FadeIn from "@/components/animations/FadeIn";
 
 import ConversationsSection from "@/components/sections/conversations-section";
+import ProjectDisplaySection from "@/components/sections/project-display-section";
 
 export default function AboutPage() {
   return (
@@ -221,67 +222,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="my-10 py-10 width-max ">
-          {/* Top row */}
-          <div className="flex items-center justify-between py-10 border-t dark:border-color-[#B3B4B4]">
-            <div className="text-4xl tracking-wide text-black dark:text-white">
-              01
-            </div>
-
-            <h2 className="text-4xl font-medium text-black dark:text-white">
-              Juhu Bungalow
-            </h2>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                aria-label="Previous"
-                className="grid h-9 w-9 place-items-center rounded-full  text-black  dark:text-white"
-              >
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M15 18l-6-6 6-6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              <button
-                type="button"
-                aria-label="Next"
-                className="grid h-9 w-9 place-items-center rounded-full  text-black dark:text-white"
-              >
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M9 6l6 6-6 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Image */}
-          <div className="w-full max-h-[420px] overflow-hidden flex justify-center">
-            <Image
-              src="/Architecture.png"
-              alt="The creators"
-              width={800} // Must provide aspect ratio
-              height={1200}
-              // w-full makes it 100% wide.
-              // h-auto maintains aspect ratio.
-              // object-contain ensures if it hits max-h, it doesn't stretch/crop awkwardly
-              className="w-full h-auto max-h-[420px] object-contain"
-              priority
-            />
-          </div>
-        </section>
+        <ProjectDisplaySection />
         <ConversationsSection />
       </div>
     </main>

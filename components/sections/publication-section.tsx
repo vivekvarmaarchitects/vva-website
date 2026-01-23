@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+// Animation components
+import FadeIn from "@/components/animations/FadeIn";
+
 type BlogRecord = {
   collectionId?: string;
   collectionName?: string;
@@ -145,6 +148,7 @@ export default function PublicationSection() {
       </h2>
 
       {/* Card Grid */}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
         {displayPosts.map((post, index) => {
           const imageUrl = resolveBlogImageUrl(post);
@@ -154,57 +158,69 @@ export default function PublicationSection() {
           const slug = post.slug ?? post.id ?? "";
           const href = slug ? `/blog/${encodeURIComponent(slug)}` : "/blog";
           return (
-            <article
+            <FadeIn
               key={post.id ?? post.slug ?? `post-${index}`}
-              className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col"
+              distance={0}
+              direction="horizontal"
+              reverse={false}
+              duration={0.5}
+              ease="ease.power3.out"
+              initialOpacity={0.2}
+              animateOpacity
+              scale={0.5}
+              threshold={0}
+              delay={index * 0.08}
+              className="h-full"
             >
-              <Link
-                href={href}
-                className="group flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
-                aria-label={post.title ?? "Blog post"}
-              >
-                {/* Image Placeholder */}
-                <div className="w-full h-48  bg-neutral-200">
-                  {imageUrl ? (
-                    <div className="relative h-full w-full overflow-hidden">
-                      <Image
-                        src={imageUrl}
-                        alt={post.image_alt ?? post.title ?? "Blog image"}
-                        fill
-                        sizes="(min-width: 768px) 320px, 100vw"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex flex-col gap-4">
-                  <div className="flex items-center gap-4">
-                    <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
-                      {post.category ?? "Blog"}
-                    </span>
-                    <span className="text-xs dark:text-white tracking-wide">
-                      {formatReadTime(post.read_time)}
-                    </span>
+              <article className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col h-full">
+                <Link
+                  href={href}
+                  className="group flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+                  aria-label={post.title ?? "Blog post"}
+                >
+                  {/* Image Placeholder */}
+                  <div className="w-full h-48 bg-neutral-200">
+                    {imageUrl ? (
+                      <div className="relative h-full w-full overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={post.image_alt ?? post.title ?? "Blog image"}
+                          fill
+                          sizes="(min-width: 768px) 320px, 100vw"
+                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        />
+                      </div>
+                    ) : null}
                   </div>
 
-                  <h3 className="text-2xl font-medium leading-snug">
-                    {post.title ?? "Untitled blog"}
-                  </h3>
+                  {/* Content */}
+                  <div className="p-6 flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
+                        {post.category ?? "Blog"}
+                      </span>
+                      <span className="text-xs dark:text-white tracking-wide">
+                        {formatReadTime(post.read_time)}
+                      </span>
+                    </div>
 
-                  <p className="dark:text-white text-sm leading-relaxed">
-                    {summary}
-                  </p>
-                </div>
+                    <h3 className="text-2xl font-medium leading-snug">
+                      {post.title ?? "Untitled blog"}
+                    </h3>
 
-                {/* Footer */}
-                <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
-                  <span>Written by</span>
-                  <span>{post.author ?? "-"}</span>
-                </div>
-              </Link>
-            </article>
+                    <p className="dark:text-white text-sm leading-relaxed">
+                      {summary}
+                    </p>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
+                    <span>Written by</span>
+                    <span>{post.author ?? "-"}</span>
+                  </div>
+                </Link>
+              </article>
+            </FadeIn>
           );
         })}
       </div>

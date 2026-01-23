@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import SplitText from "@/components/animations/TextReveal";
+import FadeIn from "@/components/animations/FadeIn";
 
 type BlogRecord = {
   collectionId?: string;
@@ -337,79 +338,85 @@ export default function BlogPublicationsSection() {
           ) : (
             <>
               {featuredPost ? (
-                <article className="space-y-4">
-                  <Link
-                    href={`/blog/${encodeURIComponent(
-                      featuredPost.slug ?? featuredPost.id ?? "",
-                    )}`}
-                    className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
-                  >
-                    <div className="relative w-full aspect-[16/9] overflow-hidden bg-neutral-200">
-                      {featuredImageUrl ? (
-                        <Image
-                          src={featuredImageUrl}
-                          alt={
-                            featuredPost.image_alt ?? featuredPost.title ?? ""
-                          }
-                          fill
-                          sizes="(min-width: 1024px) 900px, 100vw"
-                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="px-2 py-1 bg-black text-white text-[10px] uppercase tracking-[0.2em]">
-                        {featuredPost.category ?? "Blog"}
-                      </span>
-                      <span className="text-[#666766] dark:text-[#B3B4B4]">
-                        {formatReadTime(featuredPost.read_time)}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl md:text-3xl font-light leading-snug">
-                      {featuredPost.title ?? "Untitled blog"}
-                    </h2>
-                  </Link>
-                </article>
+                <FadeIn distance={0} delay={0.1}>
+                  <article className="space-y-4">
+                    <Link
+                      href={`/blog/${encodeURIComponent(
+                        featuredPost.slug ?? featuredPost.id ?? "",
+                      )}`}
+                      className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+                    >
+                      <div className="relative w-full aspect-[16/9] overflow-hidden bg-neutral-200">
+                        {featuredImageUrl ? (
+                          <Image
+                            src={featuredImageUrl}
+                            alt={
+                              featuredPost.image_alt ?? featuredPost.title ?? ""
+                            }
+                            fill
+                            sizes="(min-width: 1024px) 900px, 100vw"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          />
+                        ) : null}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="px-2 py-1 bg-black text-white text-[10px] uppercase tracking-[0.2em]">
+                          {featuredPost.category ?? "Blog"}
+                        </span>
+                        <span className="text-[#666766] dark:text-[#B3B4B4]">
+                          {formatReadTime(featuredPost.read_time)}
+                        </span>
+                      </div>
+                      <h2 className="text-2xl md:text-3xl font-light leading-snug">
+                        {featuredPost.title ?? "Untitled blog"}
+                      </h2>
+                    </Link>
+                  </article>
+                </FadeIn>
               ) : null}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {gridPosts.map((post, index) => {
                   const imageUrl = resolveBlogImageUrl(post);
                   return (
-                    <article
+                    <FadeIn
                       key={post.id ?? post.slug ?? `post-${index}`}
-                      className="space-y-4"
+                      distance={0}
+                      delay={index * 0.08}
+                      className="h-full"
                     >
-                      <Link
-                        href={`/blog/${encodeURIComponent(
-                          post.slug ?? post.id ?? "",
-                        )}`}
-                        className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
-                      >
-                        <div className="relative w-full aspect-[4/3] overflow-hidden bg-neutral-200">
-                          {imageUrl ? (
-                            <Image
-                              src={imageUrl}
-                              alt={post.image_alt ?? post.title ?? ""}
-                              fill
-                              sizes="(min-width: 768px) 420px, 100vw"
-                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                            />
-                          ) : null}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="px-2 py-1 bg-black text-white text-[10px] uppercase tracking-[0.2em]">
-                            {post.category ?? "Blog"}
-                          </span>
-                          <span className="text-[#666766] dark:text-[#B3B4B4]">
-                            {formatReadTime(post.read_time)}
-                          </span>
-                        </div>
-                        <h3 className="text-lg md:text-xl font-light leading-snug">
-                          {post.title ?? "Untitled blog"}
-                        </h3>
-                      </Link>
-                    </article>
+                      <article className="space-y-4">
+                        <Link
+                          href={`/blog/${encodeURIComponent(
+                            post.slug ?? post.id ?? "",
+                          )}`}
+                          className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+                        >
+                          <div className="relative w-full aspect-[4/3] overflow-hidden bg-neutral-200">
+                            {imageUrl ? (
+                              <Image
+                                src={imageUrl}
+                                alt={post.image_alt ?? post.title ?? ""}
+                                fill
+                                sizes="(min-width: 768px) 420px, 100vw"
+                                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                              />
+                            ) : null}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className="px-2 py-1 bg-black text-white text-[10px] uppercase tracking-[0.2em]">
+                              {post.category ?? "Blog"}
+                            </span>
+                            <span className="text-[#666766] dark:text-[#B3B4B4]">
+                              {formatReadTime(post.read_time)}
+                            </span>
+                          </div>
+                          <h3 className="text-lg md:text-xl font-light leading-snug">
+                            {post.title ?? "Untitled blog"}
+                          </h3>
+                        </Link>
+                      </article>
+                    </FadeIn>
                   );
                 })}
               </div>
