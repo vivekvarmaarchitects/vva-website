@@ -51,7 +51,7 @@ export default function LeadForm() {
       event:
         | ChangeEvent<HTMLInputElement>
         | ChangeEvent<HTMLTextAreaElement>
-        | ChangeEvent<HTMLSelectElement>
+        | ChangeEvent<HTMLSelectElement>,
     ) => {
       const value = event.target.value;
       setForm((prev) => ({ ...prev, [field]: value }));
@@ -127,7 +127,7 @@ export default function LeadForm() {
       if (!response.ok) {
         setStatus("error");
         setStatusMessage(
-          data?.error || "Something went wrong. Please try again."
+          data?.error || "Something went wrong. Please try again.",
         );
         return;
       }
@@ -148,15 +148,15 @@ export default function LeadForm() {
 
   return (
     <FadeIn className="w-full">
-      <div className="mx-auto w-full max-w-[560px] rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-sm dark:border-white/15 dark:bg-black/80 dark:shadow-[0_30px_80px_rgba(0,0,0,0.6)] md:p-10">
+      <div className="mx-auto w-full max-w-[560px] rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-sm md:p-10">
         <SplitText
           text="Lets start!"
-          className="font-sans text-3xl md:text-4xl"
+          className="font-sans text-3xl md:text-4xl text-black"
           delay={80}
           duration={0.6}
           ease="power3.out"
           splitType="chars"
-          from={{ opacity: 0.2, y: 10 }}
+          from={{ opacity: 0.2, y: 0 }}
           to={{ opacity: 1, y: 0 }}
           threshold={0.2}
           rootMargin="-80px"
@@ -196,7 +196,7 @@ export default function LeadForm() {
               value={form.name}
               onChange={handleFieldChange("name")}
               aria-invalid={Boolean(errors.name)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
+              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
             />
             {errors.name ? (
               <p className="text-xs italic text-red-500">{errors.name}</p>
@@ -214,7 +214,10 @@ export default function LeadForm() {
                 value={form.purpose}
                 onChange={handleFieldChange("purpose")}
                 aria-invalid={Boolean(errors.purpose)}
-                className="w-full appearance-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
+                className={[
+                  "w-full appearance-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none",
+                  form.purpose ? "text-black" : "text-black/40",
+                ].join(" ")}
               >
                 <option value="" disabled>
                   PURPOSE OF CONTACT*
@@ -227,7 +230,7 @@ export default function LeadForm() {
               </select>
               <svg
                 aria-hidden="true"
-                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-black/60 dark:text-white/60"
+                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-black/60 "
                 viewBox="0 0 16 16"
                 fill="none"
               >
@@ -257,7 +260,7 @@ export default function LeadForm() {
               value={form.email}
               onChange={handleFieldChange("email")}
               aria-invalid={Boolean(errors.email)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
+              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
             />
             {errors.email ? (
               <p className="text-xs italic text-red-500">{errors.email}</p>
@@ -276,7 +279,7 @@ export default function LeadForm() {
               value={form.phone_number}
               onChange={handleFieldChange("phone_number")}
               aria-invalid={Boolean(errors.phone_number)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
+              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
             />
             {errors.phone_number ? (
               <p className="text-xs italic text-red-500">
@@ -297,26 +300,26 @@ export default function LeadForm() {
               value={form.message}
               onChange={handleFieldChange("message")}
               aria-invalid={Boolean(errors.message)}
-              className="w-full resize-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none dark:border-white/20 dark:bg-black/30 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/40"
+              className="w-full resize-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
             />
             {errors.message ? (
               <p className="text-xs italic text-red-500">{errors.message}</p>
             ) : null}
           </div>
 
-          <label className="flex items-start gap-3 text-xs text-black/70 dark:text-white/70">
+          <label className="flex items-start gap-3 text-xs text-black">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 rounded border border-black/40 text-black dark:border-white/50 dark:text-white"
+              className="mt-1 h-4 w-4 rounded border border-black "
             />
             <span>
               I consent to Vivek Verma Architects processing my personal data in
               line with the{" "}
-              <span className="font-medium text-black underline underline-offset-4 dark:text-white">
+              <span className="font-medium text-black underline underline-offset-4 ">
                 privacy policy
               </span>{" "}
               and{" "}
-              <span className="font-medium text-black underline underline-offset-4 dark:text-white">
+              <span className="font-medium text-black underline underline-offset-4 ">
                 terms and conditions.
               </span>
             </span>
@@ -329,7 +332,7 @@ export default function LeadForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-6 flex w-full items-center justify-between border-b border-black/70 pb-2 text-sm uppercase tracking-[0.3em] text-black disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/50 dark:text-white"
+            className="mt-6 flex w-full items-center justify-between border-b border-black pb-2 text-sm uppercase tracking-[0.3em] text-black disabled:cursor-not-allowed disabled:opacity-60 "
           >
             <span>{isSubmitting ? "SENDING" : "SEND"}</span>
           </button>

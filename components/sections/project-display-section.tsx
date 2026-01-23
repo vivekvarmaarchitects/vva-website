@@ -22,8 +22,7 @@ type PBListResponse<T> = {
   items: T[];
 };
 
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "project";
 const PROJECTS_PER_PAGE = 200;
 const FALLBACK_IMAGE = "/1.png";
@@ -155,9 +154,7 @@ export default function ProjectDisplaySection() {
   const canNavigate = projects.length > 1;
   const activeProject = projects[activeIndex];
   const activeSlug = activeProject ? buildSlug(activeProject) : "";
-  const href = activeSlug
-    ? `/design/${encodeURIComponent(activeSlug)}`
-    : "";
+  const href = activeSlug ? `/design/${encodeURIComponent(activeSlug)}` : "";
   const imageUrl =
     (activeProject ? resolveProjectImageUrl(activeProject) : null) ??
     FALLBACK_IMAGE;
@@ -196,7 +193,7 @@ export default function ProjectDisplaySection() {
   }, [activeIndex, activeProject?.id]);
 
   return (
-    <section className="my-10 py-10 width-max">
+    <section className=" py-10 width-max">
       <div className="flex items-center justify-between py-10 border-t dark:border-color-[#B3B4B4]">
         <div className="text-4xl tracking-wide text-black dark:text-white">
           {displayIndex}
@@ -246,41 +243,45 @@ export default function ProjectDisplaySection() {
       </div>
 
       {loading ? (
-        <div className="w-full max-h-[420px] overflow-hidden flex justify-center">
-          <div className="h-[420px] w-full animate-pulse rounded-md bg-neutral-200 dark:bg-neutral-800" />
+        <div className="w-full">
+          <div className="relative w-full aspect-[16/9] overflow-hidden rounded-md bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
         </div>
       ) : error ? (
         <p className="text-center text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ) : activeProject ? (
-        <div className="w-full max-h-[420px] overflow-hidden flex justify-center">
+        <div className="w-full">
           {href ? (
             <Link
               href={href}
               className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
               aria-label={title ? `${title} project` : "Project"}
             >
+              <div className="relative w-full aspect-[16/9] overflow-hidden">
+                <Image
+                  src={imageUrl}
+                  alt={imageAlt}
+                  fill
+                  sizes="100vw"
+                  className={`object-contain transition-opacity duration-700 ease-out ${
+                    isFading ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+              </div>
+            </Link>
+          ) : (
+            <div className="relative w-full aspect-[16/9] overflow-hidden">
               <Image
                 src={imageUrl}
                 alt={imageAlt}
-                width={800}
-                height={1200}
-                className={`w-full h-auto max-h-[420px] object-contain transition-opacity duration-700 ease-out ${
+                fill
+                sizes="100vw"
+                className={`object-contain transition-opacity duration-700 ease-out ${
                   isFading ? "opacity-0" : "opacity-100"
                 }`}
               />
-            </Link>
-          ) : (
-            <Image
-              src={imageUrl}
-              alt={imageAlt}
-              width={800}
-              height={1200}
-              className={`w-full h-auto max-h-[420px] object-contain transition-opacity duration-700 ease-out ${
-                isFading ? "opacity-0" : "opacity-100"
-              }`}
-            />
+            </div>
           )}
         </div>
       ) : (

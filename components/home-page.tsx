@@ -463,9 +463,8 @@ export default function HomePage() {
         if (!response.ok) {
           throw new Error(`Request failed: ${response.status}`);
         }
-        const data = (await response.json()) as PBListResponse<
-          HomepageProjectRecord
-        >;
+        const data =
+          (await response.json()) as PBListResponse<HomepageProjectRecord>;
         const items = data.items ?? [];
         if (!active) {
           return;
@@ -634,7 +633,7 @@ export default function HomePage() {
         fallback.imageAlt ||
         fallback.title;
       const slugId = normalizeRelationId(record.Slug).trim();
-      const slug = slugId ? projectSlugMap[slugId] ?? "" : "";
+      const slug = slugId ? (projectSlugMap[slugId] ?? "") : "";
       const href = slug ? `/design/${encodeURIComponent(slug)}` : undefined;
 
       return {
@@ -957,7 +956,7 @@ export default function HomePage() {
                         : ""
                     }`}
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-30 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-10 items-center">
                       <div className="md:col-span-1 dark:text-white text-lg font-light">
                         {displayIndex}
                       </div>

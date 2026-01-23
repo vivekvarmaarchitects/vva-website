@@ -57,12 +57,12 @@ export default function AboutPage() {
         </div>
         <div className="border-b dark:border-color-[#B3B4B4]"></div>
         <p
-          className="width-max common-heading mb-10 md:my-12 text-center md:text-left"
+          className="width-max common-heading my-10 md:my-12 text-center md:text-left"
           dangerouslySetInnerHTML={{ __html: "The creators" }}
         />
 
-        {/* Vivek Verma */}
         <div className="mb-10">
+          {/* Vivek Verma */}
           <div className="width-max flex flex-col gap-10 md:flex-row">
             <div className="flex-1 min-w-0">
               <Image
@@ -76,7 +76,7 @@ export default function AboutPage() {
             <div className="block flex-1 min-w-0">
               <SplitText
                 html="With more than three decades of practice, Vivek Varma has led the studio to the forefront of integrated spatial design in India. Our work spans residential, commercial, hospitality, cultural, and developer-led environments, consistently blurring the boundaries between interior space and architectural form to create cohesive, experiential narratives."
-                className="font-display text-2xl font-light py-10"
+                className="font-display text-2xl font-light md:py-10"
                 delay={100}
                 duration={0.6}
                 ease="power3.out"
@@ -95,7 +95,7 @@ export default function AboutPage() {
                 }}
               />
               <h2
-                className=" font-display md:w-[50%]"
+                className=" font-display md:w-[50%] mt-5"
                 dangerouslySetInnerHTML={{
                   __html:
                     "Vivek Varma Architects is a multidisciplinary interior design and architecture practice driven by material sensitivity, spatial clarity, and a deep respect for human experience. Guided by founder Vivek Varma, the studio brings together design intelligence, cultural awareness, and thoughtful craftsmanship to shape environments that feel intentional, timeless, and quietly expressive.",
@@ -106,11 +106,11 @@ export default function AboutPage() {
 
           {/* Tanay Verma */}
 
-          <div className="width-max flex flex-col gap-10 md:flex-row">
-            <div className="block flex-1 min-w-0">
+          <div className="width-max flex flex-col gap-10 md:flex-row mt-20">
+            <div className="block flex-1 min-w-0 order-2 md:order-1">
               <SplitText
                 html="With more than three decades of practice, Vivek Varma has led the studio to the forefront of integrated spatial design in India. Our work spans residential, commercial, hospitality, cultural, and developer-led environments, consistently blurring the boundaries between interior space and architectural form to create cohesive, experiential narratives."
-                className="font-display text-2xl font-light py-10"
+                className="font-display text-2xl font-light md:py-10"
                 delay={100}
                 duration={0.6}
                 ease="power3.out"
@@ -129,14 +129,14 @@ export default function AboutPage() {
                 }}
               />
               <h2
-                className=" font-display md:w-[50%]"
+                className=" font-display md:w-[50%] mt-5"
                 dangerouslySetInnerHTML={{
                   __html:
                     "Vivek Varma Architects is a multidisciplinary interior design and architecture practice driven by material sensitivity, spatial clarity, and a deep respect for human experience. Guided by founder Vivek Varma, the studio brings together design intelligence, cultural awareness, and thoughtful craftsmanship to shape environments that feel intentional, timeless, and quietly expressive.",
                 }}
               />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 order-1 md:order-2">
               <Image
                 src="/2.png"
                 alt="The creators"
@@ -156,9 +156,9 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-[radial-gradient(600px_320px_at_85%_60%,rgba(255,255,255,0.06),transparent_70%)] dark:bg-[radial-gradient(600px_320px_at_85%_60%,rgba(255,255,255,0.06),transparent_70%)]" />
           </div>
 
-          <div className="relative width-max py-16 md:py-24">
+          <div className="relative width-max py-8 md:py-16">
             {/* small label */}
-            <p className="uppercase tracking-[0.35em] text-[11px] text-black/50 dark:text-white/50">
+            <p className="uppercase tracking-[0.35em] text-[11px] text-white">
               Our Philosophy
             </p>
 
@@ -185,7 +185,7 @@ export default function AboutPage() {
             />
 
             {/* 3 columns */}
-            <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
+            <div className="mt-6 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
               <div className="max-w-[360px]">
                 <p className="font-display italic font-medium text-white">
                   01 / Curiosity
