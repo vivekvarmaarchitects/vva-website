@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import DesignPage from "@/components/design-page";
 import SeoJsonLd from "@/components/seo-jsonld";
@@ -16,7 +17,9 @@ export default async function Page() {
   return (
     <>
       <SeoJsonLd objects={jsonLd} />
-      <DesignPage />
+      <Suspense fallback={null}>
+        <DesignPage />
+      </Suspense>
     </>
   );
 }
