@@ -23,6 +23,7 @@ type PBListResponse<T> = {
 };
 
 const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const PB_DEBUG = process.env.NEXT_PUBLIC_DEBUG_PB === "1";
 const POCKETBASE_COLLECTION = "project";
 const PROJECTS_PER_PAGE = 200;
 const FALLBACK_IMAGE = "/1.png";
@@ -95,6 +96,9 @@ export default function ProjectDisplaySection() {
     if (!projectListUrl) {
       setLoading(false);
       setError("Missing PocketBase URL.");
+      if (PB_DEBUG) {
+        console.error("PocketBase config error: Missing NEXT_PUBLIC_POCKETBASE_URL.");
+      }
       return;
     }
 
@@ -119,6 +123,12 @@ export default function ProjectDisplaySection() {
           setProjects(featuredProjects);
         }
       } catch (err) {
+        if (PB_DEBUG) {
+          console.error("Unable to load featured projects", {
+            err,
+            projectListUrl,
+          });
+        }
         if (
           typeof err === "object" &&
           err !== null &&

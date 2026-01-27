@@ -114,6 +114,7 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
 };
 
 const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const PB_DEBUG = process.env.NEXT_PUBLIC_DEBUG_PB === "1";
 const POCKETBASE_COLLECTION = "homepage";
 const HOMEPAGE_PROJECTS_COLLECTION = "homepage_projects";
 const PROJECT_COLLECTION = "project";
@@ -291,6 +292,7 @@ export default function HomePage() {
   const [projectSlugMap, setProjectSlugMap] = React.useState<
     Record<string, string>
   >({});
+  const [pbError, setPbError] = React.useState<string | null>(null);
 
   const recordUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records/${POCKETBASE_RECORD_ID}`;
   const homepageProjectsUrl = `${normalizedBaseUrl}/api/collections/${HOMEPAGE_PROJECTS_COLLECTION}/records?${new URLSearchParams(
@@ -309,6 +311,15 @@ export default function HomePage() {
   }, [recordUrl]);
 
   React.useEffect(() => {
+    if (!normalizedBaseUrl) {
+      const message = "Missing NEXT_PUBLIC_POCKETBASE_URL at build time.";
+      setPbError(message);
+      if (PB_DEBUG) {
+        console.error("PocketBase config error:", message);
+      }
+      return;
+    }
+
     let active = true;
     let intervalId: number | null = null;
     let timeoutId: number | null = null;
@@ -346,6 +357,13 @@ export default function HomePage() {
           writeCache(merged);
         }
       } catch (error) {
+        if (PB_DEBUG) {
+          console.error("Failed to load PocketBase homepage data", {
+            error,
+            recordUrl,
+          });
+        }
+        setPbError("Homepage fetch failed. See console for details.");
         if (process.env.NODE_ENV !== "production") {
           console.warn("Failed to load PocketBase homepage data", error);
         }
@@ -387,7 +405,7 @@ export default function HomePage() {
         window.clearTimeout(timeoutId);
       }
     };
-  }, [fetchRecord]);
+  }, [fetchRecord, recordUrl]);
 
   React.useEffect(() => {
     let active = true;
@@ -686,6 +704,13 @@ export default function HomePage() {
 
   return (
     <main>
+      {PB_DEBUG && pbError ? (
+        <div className="width-max pt-6">
+          <div className="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            PocketBase debug: {pbError}
+          </div>
+        </div>
+      ) : null}
       <div
         className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full
 "

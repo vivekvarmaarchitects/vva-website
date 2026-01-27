@@ -22,7 +22,10 @@ const scriptSrc = [
   "script-src 'self'",
   "https://www.googletagmanager.com",
   "https://www.google-analytics.com",
-  ...(isProd ? [] : ["'unsafe-inline'", "'unsafe-eval'"]),
+  // Next.js injects small inline scripts; without a nonce-based CSP,
+  // allowing inline scripts is the pragmatic fix for production.
+  "'unsafe-inline'",
+  ...(isProd ? [] : ["'unsafe-eval'"]),
 ].join(" ");
 
 const csp = [
@@ -49,8 +52,8 @@ const csp = [
   ]
     .filter(Boolean)
     .join(" "),
-  "style-src 'self' 'unsafe-inline'",
-  "font-src 'self' data: https:",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com https:",
   "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
   "media-src 'self' https:",
 ].join("; ");
