@@ -153,6 +153,7 @@ export default function ProjectDisplaySection() {
 
   const canNavigate = projects.length > 1;
   const activeProject = projects[activeIndex];
+  const activeProjectId = activeProject?.id ?? null;
   const activeSlug = activeProject ? buildSlug(activeProject) : "";
   const href = activeSlug ? `/design/${encodeURIComponent(activeSlug)}` : "";
   const imageUrl =
@@ -184,13 +185,13 @@ export default function ProjectDisplaySection() {
   }, [canNavigate, error, loading, projects.length]);
 
   useEffect(() => {
-    if (!activeProject) return;
+    if (!activeProjectId) return;
     setIsFading(true);
     const timeoutId = window.setTimeout(() => {
       setIsFading(false);
     }, 120);
     return () => window.clearTimeout(timeoutId);
-  }, [activeIndex, activeProject?.id]);
+  }, [activeProjectId]);
 
   return (
     <section className=" py-10 width-max">
@@ -244,7 +245,7 @@ export default function ProjectDisplaySection() {
 
       {loading ? (
         <div className="w-full">
-          <div className="relative w-full aspect-[16/9] overflow-hidden rounded-md bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+          <div className="relative w-full aspect-video overflow-hidden rounded-md bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
         </div>
       ) : error ? (
         <p className="text-center text-sm text-red-600 dark:text-red-400">
@@ -258,26 +259,26 @@ export default function ProjectDisplaySection() {
               className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
               aria-label={title ? `${title} project` : "Project"}
             >
-              <div className="relative w-full aspect-[16/9] overflow-hidden">
+              <div className="relative w-full aspect-video overflow-hidden">
                 <Image
                   src={imageUrl}
                   alt={imageAlt}
                   fill
                   sizes="100vw"
-                  className={`object-contain transition-opacity duration-700 ease-out ${
+                  className={`object-cover transition-opacity duration-700 ease-out ${
                     isFading ? "opacity-0" : "opacity-100"
                   }`}
                 />
               </div>
             </Link>
           ) : (
-            <div className="relative w-full aspect-[16/9] overflow-hidden">
+            <div className="relative w-full aspect-video overflow-hidden">
               <Image
                 src={imageUrl}
                 alt={imageAlt}
                 fill
                 sizes="100vw"
-                className={`object-contain transition-opacity duration-700 ease-out ${
+                className={`object-cover transition-opacity duration-700 ease-out ${
                   isFading ? "opacity-0" : "opacity-100"
                 }`}
               />

@@ -338,7 +338,7 @@ const fetchBlogBySlug = cache(async (slug: string) => {
       `${normalizedBaseUrl}/api/collections/${BLOG_COLLECTION}/records?${params.toString()}`,
       process.env.NODE_ENV === "development"
         ? { cache: "no-store" }
-        : { next: { revalidate: 300 } },
+        : { next: { revalidate: 21600 } },
     );
     if (!response.ok) {
       return null as BlogRecord | null;

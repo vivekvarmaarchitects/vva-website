@@ -51,6 +51,9 @@ export function SiteFooter() {
             <Link href="/privacy" className={footerLinkClass}>
               PRIVACY POLICY
             </Link>
+            <Link href="/sitemap.xml" className={footerLinkClass}>
+              SITEMAP
+            </Link>
           </div>
 
           <div>

@@ -49,8 +49,7 @@ const PAGE_SIZE_OPTIONS = [
 
 const BLOGS_PER_PAGE_FETCH = 200;
 
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const normalizedBaseUrl = POCKETBASE_BASE_URL.replace(/\/$/, "");
 
 const getFileName = (value?: string | string[]) => {
@@ -213,7 +212,7 @@ export default function BlogPublicationsSection() {
       <div className="mt-8">
         <SplitText
           html={"Our Publications"}
-          className="flex font-sans text-5xl font-regular"
+          className="flex font-sans text-6xl font-regular"
           delay={100}
           duration={0.6}
           ease="power3.out"
@@ -226,8 +225,8 @@ export default function BlogPublicationsSection() {
           enableScrollTrigger={true}
           tag="h1"
           scrollTriggerConfig={{
-            start: "top",
-            end: "bottom 10%",
+            start: "top top+=80",
+            end: "bottom",
             scrub: true,
             once: true,
             markers: false,
@@ -236,8 +235,8 @@ export default function BlogPublicationsSection() {
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-[160px_1fr] lg:grid-cols-[200px_1fr]">
-        <aside className="space-y-5 md:block md:z-0 sticky top-16 backdrop-blur-xs bg-white/75 dark:bg-black/75 z-1 py-3">
-          <p className="text-xs uppercase tracking-[0.25em] text-[#666766] dark:text-[#B3B4B4]">
+        <aside className="space-y-10 md:block md:z-0 sticky top-16 backdrop-blur-xs bg-white/75 dark:bg-black/75 z-1 py-3">
+          <p className="text-xs py-1 uppercase tracking-[0.25em] text-[#666766] dark:text-[#B3B4B4]">
             Filters
           </p>
           <div className="flex flex-col items-start gap-2">
@@ -298,29 +297,45 @@ export default function BlogPublicationsSection() {
               </button>
             </div>
 
-            <select
-              value={pageSize}
-              onChange={(event) => setPageSize(Number(event.target.value))}
-              className="border border-[#C9C9C9] px-3 py-2 text-xs uppercase tracking-[0.2em] text-[#666766] dark:text-[#B3B4B4] dark:border-[#4B4C4C] dark:bg-black"
-            >
-              {PAGE_SIZE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative inline-block">
+              <select
+                value={pageSize}
+                onChange={(event) => setPageSize(Number(event.target.value))}
+                className="appearance-none border border-[#C9C9C9] px-3 pr-10 py-2 text-xs uppercase tracking-[0.2em] text-[#666766] dark:text-[#B3B4B4] dark:border-[#4B4C4C] dark:bg-black"
+              >
+                {PAGE_SIZE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* custom arrow */}
+              <svg
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#666766] dark:text-[#B3B4B4]"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
           </div>
 
           {loading ? (
             <div className="space-y-10">
-              <div className="aspect-[16/9] w-full rounded bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+              <div className="aspect-video w-full rounded bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                 {Array.from({ length: 4 }, (_, index) => (
                   <div
                     key={`loading-${index}`}
                     className="space-y-4 animate-pulse"
                   >
-                    <div className="aspect-[4/3] w-full rounded bg-neutral-200 dark:bg-neutral-800" />
+                    <div className="aspect-4/3 w-full rounded bg-neutral-200 dark:bg-neutral-800" />
                     <div className="h-4 w-20 rounded bg-neutral-200 dark:bg-neutral-800" />
                     <div className="h-6 w-3/4 rounded bg-neutral-200 dark:bg-neutral-800" />
                   </div>
@@ -346,7 +361,7 @@ export default function BlogPublicationsSection() {
                       )}`}
                       className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
                     >
-                      <div className="relative w-full aspect-[16/9] overflow-hidden bg-neutral-200">
+                      <div className="relative w-full aspect-video overflow-hidden bg-neutral-200">
                         {featuredImageUrl ? (
                           <Image
                             src={featuredImageUrl}
@@ -392,7 +407,7 @@ export default function BlogPublicationsSection() {
                           )}`}
                           className="group block space-y-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
                         >
-                          <div className="relative w-full aspect-[4/3] overflow-hidden bg-neutral-200">
+                          <div className="relative w-full aspect-4/3 overflow-hidden bg-neutral-200">
                             {imageUrl ? (
                               <Image
                                 src={imageUrl}

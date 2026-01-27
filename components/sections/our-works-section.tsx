@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import FadeIn from "@/components/animations/FadeIn";
 
 type ProjectRecord = {
@@ -37,8 +38,7 @@ type Tab = {
 const ALL_TAB = "All";
 const PROJECTS_PER_PAGE = 200;
 
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "project";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
@@ -94,6 +94,17 @@ const LOADING_CARDS = Array.from({ length: 6 }, (_, index) => ({
   arcWindow: index % 2 === 0,
 }));
 
+const SCOPE_DESCRIPTIONS: Record<string, string> = {
+  Interior:
+    "Our interior design work spans private residences, commercial environments, hospitality spaces, and large-scale developer-led projects, shaped through material exploration and experiential clarity.",
+  Architecture:
+    "Architectural projects that respond to context, scale, and program, developed in close dialogue with interior spatial intent.",
+  Details:
+    "A focused study of materials, joinery, light, and crafted elements drawn from selected projects across the studio’s body of work.",
+  Furniture:
+    "Bespoke furniture and object-led design developed as an extension of our interior and architectural projects.",
+};
+
 const ProjectCard = ({
   project,
   imageUrl,
@@ -106,7 +117,7 @@ const ProjectCard = ({
   const slug = project.slug ?? project.id ?? "";
   const href = `/design/${encodeURIComponent(slug)}`;
   const imageWrapperClasses = [
-    "relative h-[460px] w-full overflow-hidden sm:h-[420px] lg:h-[475px]",
+    "relative aspect-[3/4] w-full overflow-hidden",
     project.arc_window ? "rounded-t-[1000px]" : "rounded-0",
   ].join(" ");
 
@@ -123,7 +134,7 @@ const ProjectCard = ({
             alt={project.Name ?? "Project image"}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             priority={priority}
           />
         </div>
@@ -152,12 +163,14 @@ export default function OurWorksSection() {
   const [active, setActive] = useState<string>(ALL_TAB);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const scopeParam = (searchParams.get("scope") ?? "").trim();
 
   const projectListUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records?${new URLSearchParams(
     {
       filter: "featured=true",
       perPage: String(PROJECTS_PER_PAGE),
-    }
+    },
   ).toString()}`;
 
   useEffect(() => {
@@ -224,6 +237,23 @@ export default function OurWorksSection() {
   const tabs = useMemo(() => buildTabs(scopes), [scopes]);
 
   useEffect(() => {
+    if (!scopeParam) {
+      return;
+    }
+    const match =
+      scopes.find(
+        (scope) =>
+          toTabSlug(scope) === toTabSlug(scopeParam) ||
+          scope.toLowerCase() === scopeParam.toLowerCase(),
+      ) ?? null;
+    if (match) {
+      setActive((prev) => (prev === match ? prev : match));
+    } else {
+      setActive((prev) => (prev === ALL_TAB ? prev : ALL_TAB));
+    }
+  }, [scopeParam, scopes]);
+
+  useEffect(() => {
     if (active !== ALL_TAB && !scopes.includes(active)) {
       setActive(ALL_TAB);
     }
@@ -237,6 +267,8 @@ export default function OurWorksSection() {
     }
     return projects.filter((project) => project.Scope?.trim() === active);
   }, [active, projects]);
+
+  const activeDescription = SCOPE_DESCRIPTIONS[active] ?? "";
 
   return (
     <section className="width-max">
@@ -271,6 +303,12 @@ export default function OurWorksSection() {
           })}
         </div>
 
+        <div className="mt-6 flex justify-center">
+          <div className="min-h-24 max-w-3xl text-center text-base leading-relaxed text-black dark:text-white">
+            {activeDescription ? <p>{activeDescription}</p> : null}
+          </div>
+        </div>
+
         <div
           role="tabpanel"
           id={activeTab.panelId}
@@ -283,7 +321,7 @@ export default function OurWorksSection() {
                 <div key={card.id} className="animate-pulse">
                   <div
                     className={[
-                      "relative h-[460px] w-full overflow-hidden sm:h-[420px] lg:h-[475px]",
+                      "relative aspect-3/4 w-full overflow-hidden",
                       card.arcWindow ? "rounded-t-[1000px]" : "rounded-0",
                       "bg-neutral-200 dark:bg-neutral-800",
                     ].join(" ")}

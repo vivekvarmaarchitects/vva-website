@@ -64,8 +64,7 @@ const DEFAULT_RECORD: NumbersAndTestimonialsRecord = {
 };
 
 // Env-driven PB settings so staging/prod can swap without code changes.
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const POCKETBASE_COLLECTION = "numbers_and_testimonials";
 const POCKETBASE_RECORD_ID =
   process.env.NEXT_PUBLIC_PB_NUMBERS_TESTIMONIALS_ID ?? "lphz7j9p1wcglox";
@@ -104,7 +103,7 @@ const getFileName = (value?: string | string[]) => {
 // Build a PB file URL when the logo is stored as a filename.
 const buildFileUrl = (
   record: NumbersAndTestimonialsRecord,
-  value?: string | string[]
+  value?: string | string[],
 ) => {
   const filename = getFileName(value);
   if (!filename || !record.collectionId || !record.id) {
@@ -153,6 +152,7 @@ export default function ResultsVisionSection({
     let active = true;
     let intervalId: number | null = null;
     let timeoutId: number | null = null;
+    let cacheTimeoutId: number | null = null;
 
     // Read cached record + timestamp so refresh doesn't trigger immediate refetch.
     const readCache = () => {
@@ -198,7 +198,13 @@ export default function ResultsVisionSection({
 
     const cached = readCache();
     if (cached?.data) {
-      setRecord({ ...DEFAULT_RECORD, ...cached.data });
+      const merged = { ...DEFAULT_RECORD, ...cached.data };
+      // Schedule cache hydration to avoid sync setState in effect.
+      cacheTimeoutId = window.setTimeout(() => {
+        if (active) {
+          setRecord(merged);
+        }
+      }, 0);
     }
 
     // Respect refresh interval across reloads; avoid immediate re-fetch.
@@ -217,7 +223,7 @@ export default function ResultsVisionSection({
           load();
           intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
         },
-        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining
+        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining,
       );
     } else {
       load();
@@ -230,6 +236,9 @@ export default function ResultsVisionSection({
       }
       if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
+      }
+      if (cacheTimeoutId !== null) {
+        window.clearTimeout(cacheTimeoutId);
       }
     };
   }, [fetchRecord]);
@@ -303,9 +312,9 @@ export default function ResultsVisionSection({
 
   return (
     <section className="bg-black text-white">
-      <div className="width-max py-8">
+      <div className="width-max pb-16">
         <h2
-          className="mb-12 text-center font-[#C3C3C3] common-heading "
+          className="text-center font-[#C3C3C3] common-heading py-10"
           dangerouslySetInnerHTML={{ __html: headingContent }}
         />
 
@@ -454,7 +463,7 @@ export default function ResultsVisionSection({
 
                   <td
                     colSpan={1}
-                    className="p-8 align-top border dark:border-white min-w-[150px]"
+                    className="p-8 align-top border dark:border-white min-w-sm"
                   >
                     <CountUp
                       from={0}
@@ -474,10 +483,7 @@ export default function ResultsVisionSection({
                     </p>
                   </td>
 
-                  <td
-                    colSpan={3}
-                    className="p-8 align-top w-full min-w-sm min-w-[150px]"
-                  >
+                  <td colSpan={3} className="p-8 align-top w-full min-w-sm ">
                     <div className="flex flex-col justify-between min-h-[120px]">
                       <div>
                         <p className="text-sm text-neutral-200 leading-relaxed">

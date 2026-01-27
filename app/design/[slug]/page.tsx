@@ -27,8 +27,7 @@ type PageProps = {
   }>;
 };
 
-const POCKETBASE_BASE_URL =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const PROJECT_COLLECTION = "project";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
@@ -144,7 +143,9 @@ const getLocationTokens = (project: ProjectRecord) => {
     .map((part) => part.trim())
     .filter(Boolean);
   const labelParts = [locality, city].filter(Boolean);
-  const label = labelParts.length ? labelParts.join(", ") : fallbackParts.join(", ");
+  const label = labelParts.length
+    ? labelParts.join(", ")
+    : fallbackParts.join(", ");
   const keywordParts = [locality, city, state].filter(Boolean);
   const keywords = keywordParts.length ? keywordParts : fallbackParts;
   return { locality, city, state, country, label, keywords };
@@ -217,7 +218,7 @@ const fetchProjectBySlug = cache(async (slug: string) => {
       `${normalizedBaseUrl}/api/collections/${PROJECT_COLLECTION}/records?${params.toString()}`,
       process.env.NODE_ENV === "development"
         ? { cache: "no-store" }
-        : { next: { revalidate: 300 } },
+        : { next: { revalidate: 21600 } },
     );
     if (!response.ok) {
       return null as ProjectRecord | null;

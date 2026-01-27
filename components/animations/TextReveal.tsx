@@ -233,9 +233,10 @@ const SplitText: React.FC<SplitTextProps> = ({
       textAlign,
       wordWrap: "break-word",
       willChange: "transform, opacity",
+      paddingBottom: "0.12em",
     };
     const classes =
-      "split-parent overflow-hidden inline-block whitespace-normal " +
+      "split-parent overflow-hidden inline-block whitespace-normal leading-[1.1] pb-[0.12em] " +
       className;
 
     switch (tag) {

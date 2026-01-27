@@ -11,7 +11,7 @@ export default function ContactPage() {
     <div className="relative min-h-screen overflow-hidden bg-white text-black dark:bg-black dark:text-white">
       <div className="absolute inset-0">
         <Image
-          src="/1.png"
+          src="/contact/contact_1.webp"
           alt=""
           fill
           priority

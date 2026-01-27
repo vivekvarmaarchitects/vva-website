@@ -22,6 +22,7 @@ type FormState = {
   phone_number: string;
   message: string;
   company: string;
+  consent: boolean;
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -33,6 +34,7 @@ const initialFormState: FormState = {
   phone_number: "",
   message: "",
   company: "",
+  consent: false,
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,9 +90,20 @@ export default function LeadForm() {
     if (!message) {
       nextErrors.message = "Message is required.";
     }
+    if (!form.consent) {
+      nextErrors.consent = "Consent is required.";
+    }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleConsentChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setForm((prev) => ({ ...prev, consent: checked }));
+    if (errors.consent) {
+      setErrors((prev) => ({ ...prev, consent: undefined }));
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -113,6 +126,7 @@ export default function LeadForm() {
       message: form.message.trim(),
       pageUrl,
       company: form.company.trim(),
+      consent: form.consent,
     };
 
     try {
@@ -145,10 +159,11 @@ export default function LeadForm() {
   const isSubmitting = status === "submitting";
   const statusColor =
     status === "success" ? "text-emerald-600" : "text-red-500";
+  const isPurposeFilled = Boolean(form.purpose);
 
   return (
     <FadeIn className="w-full">
-      <div className="mx-auto w-full max-w-[560px] rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-sm md:p-10">
+      <div className="mx-auto w-full max-w-[560px] rounded-[10px] border border-black/10 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-sm md:p-10">
         <SplitText
           text="Lets start!"
           className="font-sans text-3xl md:text-4xl text-black"
@@ -185,28 +200,30 @@ export default function LeadForm() {
           />
 
           <div className="space-y-2">
-            <label className="sr-only" htmlFor="full-name">
-              Name
-            </label>
-            <input
-              id="full-name"
-              name="name"
-              type="text"
-              placeholder="FULL NAME*"
-              value={form.name}
-              onChange={handleFieldChange("name")}
-              aria-invalid={Boolean(errors.name)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
-            />
+            <div className="relative">
+              <input
+                id="full-name"
+                name="name"
+                type="text"
+                placeholder=" "
+                value={form.name}
+                onChange={handleFieldChange("name")}
+                aria-invalid={Boolean(errors.name)}
+                className="peer w-full rounded-[10px] border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-transparent focus:border-black/40 focus:outline-none"
+              />
+              <label
+                htmlFor="full-name"
+                className="pointer-events-none absolute left-4 top-3 bg-white px-1 text-xs tracking-[0.2em] text-black/40 transition-all duration-200 ease-out peer-focus:-top-1 peer-focus:text-[10px] peer-focus:text-black peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-black"
+              >
+                FULL NAME*
+              </label>
+            </div>
             {errors.name ? (
               <p className="text-xs italic text-red-500">{errors.name}</p>
             ) : null}
           </div>
 
           <div className="space-y-2">
-            <label className="sr-only" htmlFor="purpose">
-              Purpose of contact
-            </label>
             <div className="relative">
               <select
                 id="purpose"
@@ -215,8 +232,10 @@ export default function LeadForm() {
                 onChange={handleFieldChange("purpose")}
                 aria-invalid={Boolean(errors.purpose)}
                 className={[
-                  "w-full appearance-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none",
-                  form.purpose ? "text-black" : "text-black/40",
+                  "peer w-full appearance-none rounded-[10px] border border-black/20 bg-white px-4 py-3 text-sm focus:border-black/40 focus:outline-none",
+                  form.purpose
+                    ? "text-black"
+                    : "text-transparent [&>option]:text-black",
                 ].join(" ")}
               >
                 <option value="" disabled>
@@ -228,6 +247,17 @@ export default function LeadForm() {
                   </option>
                 ))}
               </select>
+              <label
+                htmlFor="purpose"
+                className={[
+                  "pointer-events-none absolute left-4 bg-white px-1 tracking-[0.2em] transition-all duration-200 ease-out peer-focus:-top-1 peer-focus:text-[10px] peer-focus:text-black",
+                  isPurposeFilled
+                    ? "-top-2 text-[10px] text-black"
+                    : "top-3 text-xs text-black/40",
+                ].join(" ")}
+              >
+                PURPOSE OF CONTACT*
+              </label>
               <svg
                 aria-hidden="true"
                 className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-black/60 "
@@ -249,38 +279,48 @@ export default function LeadForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="sr-only" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="EMAIL*"
-              value={form.email}
-              onChange={handleFieldChange("email")}
-              aria-invalid={Boolean(errors.email)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
-            />
+            <div className="relative">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder=" "
+                value={form.email}
+                onChange={handleFieldChange("email")}
+                aria-invalid={Boolean(errors.email)}
+                className="peer w-full rounded-[10px] border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-transparent focus:border-black/40 focus:outline-none"
+              />
+              <label
+                htmlFor="email"
+                className="pointer-events-none absolute left-4 top-3 bg-white px-1 text-xs tracking-[0.2em] text-black/40 transition-all duration-200 ease-out peer-focus:-top-1 peer-focus:text-[10px] peer-focus:text-black peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-black"
+              >
+                EMAIL*
+              </label>
+            </div>
             {errors.email ? (
               <p className="text-xs italic text-red-500">{errors.email}</p>
             ) : null}
           </div>
 
           <div className="space-y-2">
-            <label className="sr-only" htmlFor="phone">
-              Phone number
-            </label>
-            <input
-              id="phone"
-              name="phone_number"
-              type="text"
-              placeholder="PHONE NUMBER*"
-              value={form.phone_number}
-              onChange={handleFieldChange("phone_number")}
-              aria-invalid={Boolean(errors.phone_number)}
-              className="w-full rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
-            />
+            <div className="relative">
+              <input
+                id="phone"
+                name="phone_number"
+                type="text"
+                placeholder=" "
+                value={form.phone_number}
+                onChange={handleFieldChange("phone_number")}
+                aria-invalid={Boolean(errors.phone_number)}
+                className="peer w-full rounded-[10px] border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-transparent focus:border-black/40 focus:outline-none"
+              />
+              <label
+                htmlFor="phone"
+                className="pointer-events-none absolute left-4 top-3 bg-white px-1 text-xs tracking-[0.2em] text-black/40 transition-all duration-200 ease-out peer-focus:-top-1 peer-focus:text-[10px] peer-focus:text-black peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-black"
+              >
+                PHONE NUMBER*
+              </label>
+            </div>
             {errors.phone_number ? (
               <p className="text-xs italic text-red-500">
                 {errors.phone_number}
@@ -289,19 +329,24 @@ export default function LeadForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="sr-only" htmlFor="message">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              placeholder="MESSAGE*"
-              rows={4}
-              value={form.message}
-              onChange={handleFieldChange("message")}
-              aria-invalid={Boolean(errors.message)}
-              className="w-full resize-none rounded-xl border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-xs placeholder:tracking-[0.2em] placeholder:text-black/40 focus:border-black/40 focus:outline-none "
-            />
+            <div className="relative">
+              <textarea
+                id="message"
+                name="message"
+                placeholder=" "
+                rows={4}
+                value={form.message}
+                onChange={handleFieldChange("message")}
+                aria-invalid={Boolean(errors.message)}
+                className="peer w-full resize-none rounded-[10px] border border-black/20 bg-white px-4 py-3 text-sm text-black placeholder:text-transparent focus:border-black/40 focus:outline-none"
+              />
+              <label
+                htmlFor="message"
+                className="pointer-events-none absolute left-4 top-3 bg-white px-1 text-xs tracking-[0.2em] text-black/40 transition-all duration-200 ease-out peer-focus:-top-1 peer-focus:text-[10px] peer-focus:text-black peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-black"
+              >
+                MESSAGE*
+              </label>
+            </div>
             {errors.message ? (
               <p className="text-xs italic text-red-500">{errors.message}</p>
             ) : null}
@@ -310,7 +355,11 @@ export default function LeadForm() {
           <label className="flex items-start gap-3 text-xs text-black">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 rounded border border-black "
+              name="consent"
+              checked={form.consent}
+              onChange={handleConsentChange}
+              aria-invalid={Boolean(errors.consent)}
+              className="mt-1 h-4 w-4 rounded-[10px] border border-black "
             />
             <span>
               I consent to Vivek Verma Architects processing my personal data in
@@ -324,6 +373,9 @@ export default function LeadForm() {
               </span>
             </span>
           </label>
+          {errors.consent ? (
+            <p className="text-xs italic text-red-500">{errors.consent}</p>
+          ) : null}
 
           {statusMessage ? (
             <p className={`text-xs ${statusColor}`}>{statusMessage}</p>
@@ -332,9 +384,36 @@ export default function LeadForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-6 flex w-full items-center justify-between border-b border-black pb-2 text-sm uppercase tracking-[0.3em] text-black disabled:cursor-not-allowed disabled:opacity-60 "
+            className="mt-6 flex w-[25%] items-center justify-between border-b border-black pb-2 text-sm uppercase tracking-[0.3em] text-black disabled:cursor-not-allowed disabled:opacity-60 "
           >
             <span>{isSubmitting ? "SENDING" : "SEND"}</span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 105 65"
+              fill="none"
+              className="h-4 w-4"
+            >
+              <path
+                d="M00 32H100"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinecap="square"
+              />
+              <path
+                d="M100 32L62 9"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
+              />
+              <path
+                d="M100 32L62 54"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
+              />
+            </svg>
           </button>
         </form>
       </div>

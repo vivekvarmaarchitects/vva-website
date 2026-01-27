@@ -690,52 +690,83 @@ export default function HomePage() {
         className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full
 "
       >
-        <div className="md:flex horizontal block space-between gap-5  width-max py-5 mt-16">
-          <SplitText
-            html={heroTextHtml}
-            className="flex font-sans text-5xl font-regular"
-            delay={100}
-            duration={0.6}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0.2, y: 0 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="left"
-            enableScrollTrigger={true}
-            tag="h1"
-            scrollTriggerConfig={{
-              start: "top",
-              end: "bottom 10%",
-              scrub: true,
-              once: true,
-              markers: false,
-            }}
-          />
-          <h2
-            className="font-display md:w-[50%] sub-hero-text"
-            dangerouslySetInnerHTML={{ __html: subHeroHtml }}
-          />
+        <div className="md:flex horizontal block space-between gap-5  width-max mt-16 py-16">
+          <FadeIn
+            distance={0}
+            duration={1}
+            ease="power2.out"
+            initialOpacity={0}
+            animateOpacity
+            threshold={0}
+            delay={0}
+          >
+            <SplitText
+              html={heroTextHtml}
+              className="flex font-sans text-5xl font-regular"
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0.2, y: 0 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="left"
+              enableScrollTrigger={true}
+              tag="h1"
+              scrollTriggerConfig={{
+                start: "top",
+                end: "bottom 10%",
+                scrub: true,
+                once: true,
+                markers: false,
+              }}
+            />
+          </FadeIn>
+          <FadeIn
+            distance={0}
+            duration={1.2}
+            ease="power2.out"
+            initialOpacity={0}
+            animateOpacity
+            threshold={0}
+            delay={0.4}
+          >
+            <h2
+              className="font-display md:w-[50%] sub-hero-text"
+              dangerouslySetInnerHTML={{ __html: subHeroHtml }}
+            />
+          </FadeIn>
         </div>
         <div className="w-full">
-          <div className="relative h-[480px] md:h-[640px] overflow-hidden">
-            {heroImages.map((src, index) => (
-              <Image
-                key={`${src}-${index}`}
-                src={src}
-                alt={heroAlts[index] || heroAltText}
-                fill
-                sizes="100vw"
-                priority={index === 0}
-                className={`absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000 ${
-                  index === heroIndex ? "opacity-100" : "opacity-0"
-                }`}
-              />
-            ))}
-          </div>
+          <FadeIn
+            distance={0}
+            duration={1.4}
+            ease="power2.out"
+            initialOpacity={0}
+            animateOpacity
+            threshold={0}
+            delay={0.8}
+            className="w-full"
+          >
+            <div className="relative h-[480px] md:h-[640px] overflow-hidden">
+              {heroImages.map((src, index) => (
+                <Image
+                  key={`${src}-${index}`}
+                  src={src}
+                  alt={heroAlts[index] || heroAltText}
+                  fill
+                  sizes="100vw"
+                  priority={index === 0}
+                  className={`absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000 ${
+                    index === heroIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
+            </div>
+          </FadeIn>
         </div>
-        <div className="w-full width-max py-5 text-center border-b dark:border-color-[#B3B4B4] common-heading dark:border-color-[#B3B4B4]">
+        <div className="w-full width-max py-10 text-center border-b dark:border-color-[#B3B4B4] common-heading dark:border-color-[#B3B4B4]">
           <p dangerouslySetInnerHTML={{ __html: heading1Html }} />
         </div>
         <div className="width-max">
@@ -957,7 +988,7 @@ export default function HomePage() {
                     }`}
                   >
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-10 items-center">
-                      <div className="md:col-span-1 dark:text-white text-lg font-light">
+                      <div className="md:col-span-1 dark:text-white text-lg font-light ">
                         {displayIndex}
                       </div>
 

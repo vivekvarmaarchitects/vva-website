@@ -96,6 +96,16 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       ease,
     });
 
+    const playIfVisible = () => {
+      const rect = el.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      const triggerLine = viewportHeight * (1 - threshold);
+      if (rect.top <= triggerLine) {
+        tl.play(0);
+      }
+    };
+
     const st = ScrollTrigger.create({
       trigger: el,
       scroller: scrollerTarget || window,
@@ -104,7 +114,11 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       onEnter: () => tl.play(),
     });
 
+    playIfVisible();
+    const rafId = window.requestAnimationFrame(playIfVisible);
+
     return () => {
+      window.cancelAnimationFrame(rafId);
       st.kill();
       tl.kill();
     };

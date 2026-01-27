@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import SplitText from "@/components/animations/TextReveal";
 import Conversations from "@/components/sections/conversations-section";
 import type { ProjectRecord } from "@/lib/project-types";
+import MouseTrail from "@/components/effects/mouse-trail";
 
 type DesignProjectPageProps = {
   project: ProjectRecord;
@@ -16,6 +18,12 @@ type DesignProjectPageProps = {
 };
 
 type ImageCarouselProps = {
+  images: string[];
+  alts: string[];
+  nameLabel: string;
+};
+
+type ImageMarqueeProps = {
   images: string[];
   alts: string[];
   nameLabel: string;
@@ -53,6 +61,172 @@ function ImageCarousel({ images, alts, nameLabel }: ImageCarouselProps) {
   );
 }
 
+function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const contentWidthRef = useRef(0);
+  const offsetRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const group = groupRef.current;
+    if (!track || !group) return;
+
+    const updateWidth = () => {
+      contentWidthRef.current = group.scrollWidth;
+      if (contentWidthRef.current === 0) {
+        offsetRef.current = 0;
+      }
+    };
+
+    updateWidth();
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(group);
+
+    let lastTime = performance.now();
+    const speed = 40;
+    const animate = (time: number) => {
+      const width = contentWidthRef.current;
+      const delta = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!isDraggingRef.current && width > 0) {
+        offsetRef.current -= speed * delta;
+        if (offsetRef.current <= -width) {
+          offsetRef.current += width;
+        } else if (offsetRef.current > 0) {
+          offsetRef.current -= width;
+        }
+      }
+
+      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      resizeObserver.disconnect();
+    };
+  }, [images.length]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      isDraggingRef.current = true;
+      dragStartXRef.current = event.clientX;
+      dragStartOffsetRef.current = offsetRef.current;
+      container.setPointerCapture(event.pointerId);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!isDraggingRef.current) return;
+      const width = contentWidthRef.current;
+      const delta = event.clientX - dragStartXRef.current;
+      let nextOffset = dragStartOffsetRef.current + delta;
+
+      if (width > 0) {
+        if (nextOffset <= -width) {
+          nextOffset += width;
+          dragStartOffsetRef.current += width;
+          dragStartXRef.current = event.clientX;
+        } else if (nextOffset > 0) {
+          nextOffset -= width;
+          dragStartOffsetRef.current -= width;
+          dragStartXRef.current = event.clientX;
+        }
+      }
+
+      offsetRef.current = nextOffset;
+    };
+
+    const stopDragging = (event: PointerEvent) => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      if (container.hasPointerCapture(event.pointerId)) {
+        container.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    container.addEventListener("pointerdown", handlePointerDown);
+    container.addEventListener("pointermove", handlePointerMove);
+    container.addEventListener("pointerup", stopDragging);
+    container.addEventListener("pointercancel", stopDragging);
+    container.addEventListener("pointerleave", stopDragging);
+
+    return () => {
+      container.removeEventListener("pointerdown", handlePointerDown);
+      container.removeEventListener("pointermove", handlePointerMove);
+      container.removeEventListener("pointerup", stopDragging);
+      container.removeEventListener("pointercancel", stopDragging);
+      container.removeEventListener("pointerleave", stopDragging);
+    };
+  }, []);
+
+  if (!images.length) {
+    return null;
+  }
+
+  return (
+    <div className="my-16">
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing"
+      >
+        <div
+          ref={trackRef}
+          className="flex w-max gap-6 will-change-transform"
+          aria-live="off"
+        >
+          <div ref={groupRef} className="flex w-max gap-6">
+            {images.map((src, index) => (
+              <div
+                key={`marquee-card-${src}-${index}`}
+                className="relative aspect-4/3 w-[260px] sm:w-[320px] lg:w-[360px] flex-none overflow-hidden rounded-[10px] bg-neutral-100"
+              >
+                <Image
+                  src={src}
+                  alt={alts[index] ?? nameLabel}
+                  fill
+                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 320px, 260px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          <div aria-hidden="true" className="flex w-max gap-6">
+            {images.map((src, index) => (
+              <div
+                key={`marquee-card-clone-${src}-${index}`}
+                className="relative aspect-4/3 w-[260px] sm:w-[320px] lg:w-[360px] flex-none overflow-hidden rounded-[10px] bg-neutral-100"
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 320px, 260px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DesignProjectPage({
   project,
   imageGroupOne,
@@ -60,18 +234,44 @@ export default function DesignProjectPage({
   imageOneAlt,
   imageTwoAlt,
 }: DesignProjectPageProps) {
-  const scopeLabel = project.Scope?.trim() || "Project";
+  const scopeValue = project.Scope?.trim();
+  const scopeLabel = scopeValue || "Project";
   const nameLabel = project.Name?.trim() || "Project";
   const imageOneKey = imageGroupOne.join("|") || "group-one";
   const imageTwoKey = imageGroupTwo.join("|") || "group-two";
 
   return (
     <div className=" mt-32">
+      <MouseTrail trailDurationMs={320} />
+      <MouseTrail enabled={true} />;
       <div className="width-max">
         <div className="font-display text-s">
           <p>
-            {/* TODO: make breakcrumb links Clickabele */}
-            Home / Design / {scopeLabel} / {nameLabel}
+            <Link
+              href="/"
+              className="transition-colors hover:text-black/70 dark:hover:text-white/80"
+            >
+              Home
+            </Link>{" "}
+            /{" "}
+            <Link
+              href="/design"
+              className="transition-colors hover:text-black/70 dark:hover:text-white/80"
+            >
+              Design
+            </Link>{" "}
+            /{" "}
+            {scopeValue ? (
+              <Link
+                href={{ pathname: "/design", query: { scope: scopeValue } }}
+                className="transition-colors hover:text-black/70 dark:hover:text-white/80"
+              >
+                {scopeLabel}
+              </Link>
+            ) : (
+              scopeLabel
+            )}{" "}
+            / <span aria-current="page">{nameLabel}</span>
           </p>
         </div>
 
@@ -130,7 +330,6 @@ export default function DesignProjectPage({
           </div>
         </div>
       </div>
-
       {/* Image 1 */}
       <ImageCarousel
         key={`image-group-one-${imageOneKey}`}
@@ -138,7 +337,6 @@ export default function DesignProjectPage({
         alts={imageOneAlt}
         nameLabel={nameLabel}
       />
-
       {/* Title 1 */}
       <div className="width-max md:my-16">
         <p className="common-heading mb-10 md:my-16 text-center md:text-left">
@@ -146,9 +344,8 @@ export default function DesignProjectPage({
         </p>
         <p className="font-display text-xl font-light">{project.field_1}</p>
       </div>
-
       {/* Image 2 */}
-      <ImageCarousel
+      <ImageMarquee
         key={`image-group-two-${imageTwoKey}`}
         images={imageGroupTwo}
         alts={imageTwoAlt}

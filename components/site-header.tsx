@@ -4,27 +4,31 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 import { VscColorMode } from "react-icons/vsc";
 
 import { FaFacebookF, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 
 function Logo() {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Avoid SSR/client mismatch by waiting for the client theme to resolve.
-  const logoSrc =
-    mounted && resolvedTheme === "dark" ? "/vva-white.svg" : "/vva-black.svg";
-
   return (
     <Link href="/" className="flex items-center gap-2">
-      <Image src={logoSrc} alt="VVA logo" width={80} height={24} priority />
+      <Image
+        src="/vva-black.svg"
+        alt="VVA logo"
+        width={80}
+        height={24}
+        priority
+        className="block dark:hidden"
+      />
+      <Image
+        src="/vva-white.svg"
+        alt="VVA logo"
+        width={80}
+        height={24}
+        priority
+        className="hidden dark:block"
+      />
     </Link>
   );
 }
@@ -73,7 +77,7 @@ export function SiteHeader() {
               href="/blog"
               className="text-black/80 hover:text-black dark:text-white/80 dark:hover:text-white transition-colors"
             >
-              Publication
+              Publications
             </Link>
           </nav>
 

@@ -39,7 +39,7 @@ export default function Conversations() {
               <span>
                 <Link
                   href="/contact-us"
-                  className="underline decoration-2 underline-offset-6"
+                  className="faint-underline text-black dark:text-white"
                 >
                   Let&apos;s Shape
                 </Link>{" "}

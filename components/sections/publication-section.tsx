@@ -149,7 +149,7 @@ export default function PublicationSection() {
 
       {/* Card Grid */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16 ">
         {displayPosts.map((post, index) => {
           const imageUrl = resolveBlogImageUrl(post);
           const summarySource =
@@ -169,13 +169,13 @@ export default function PublicationSection() {
               animateOpacity
               scale={0.5}
               threshold={0}
-              delay={index * 0.08}
+              delay={index * 0.06}
               className="h-full"
             >
               <article className="border dark:border-[#B3B4B4] overflow-hidden flex flex-col h-full">
                 <Link
                   href={href}
-                  className="group flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+                  className="group flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white z-20 dark:bg-black bg-white"
                   aria-label={post.title ?? "Blog post"}
                 >
                   {/* Image Placeholder */}
@@ -194,7 +194,7 @@ export default function PublicationSection() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-6 flex flex-col gap-4">
+                  <div className="p-6 flex flex-col gap-4 ">
                     <div className="flex items-center gap-4">
                       <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
                         {post.category ?? "Blog"}
