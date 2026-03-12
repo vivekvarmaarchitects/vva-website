@@ -15,6 +15,16 @@ type DesignProjectPageProps = {
   imageGroupTwo: string[];
   imageOneAlt: string[];
   imageTwoAlt: string[];
+  previousProject: {
+    href: string;
+    label: string;
+    isAvailable: boolean;
+  };
+  nextProject: {
+    href: string;
+    label: string;
+    isAvailable: boolean;
+  };
 };
 
 type ImageCarouselProps = {
@@ -67,18 +77,24 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
   const groupRef = useRef<HTMLDivElement | null>(null);
   const animationRef = useRef<number | null>(null);
   const contentWidthRef = useRef(0);
+  const [cloneCount, setCloneCount] = useState(2);
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const offsetRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const dragStartXRef = useRef(0);
-  const dragStartOffsetRef = useRef(0);
 
   useEffect(() => {
     const track = trackRef.current;
     const group = groupRef.current;
+    const container = containerRef.current;
     if (!track || !group) return;
 
     const updateWidth = () => {
       contentWidthRef.current = group.scrollWidth;
+      const containerWidth = container?.clientWidth ?? 0;
+      if (contentWidthRef.current > 0 && containerWidth > 0) {
+        const neededCopies =
+          Math.ceil(containerWidth / contentWidthRef.current) + 1;
+        setCloneCount(Math.max(2, neededCopies));
+      }
       if (contentWidthRef.current === 0) {
         offsetRef.current = 0;
       }
@@ -87,6 +103,9 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
     updateWidth();
     const resizeObserver = new ResizeObserver(updateWidth);
     resizeObserver.observe(group);
+    if (container) {
+      resizeObserver.observe(container);
+    }
 
     let lastTime = performance.now();
     const speed = 40;
@@ -95,7 +114,7 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
       const delta = (time - lastTime) / 1000;
       lastTime = time;
 
-      if (!isDraggingRef.current && width > 0) {
+      if (width > 0) {
         offsetRef.current -= speed * delta;
         if (offsetRef.current <= -width) {
           offsetRef.current += width;
@@ -119,110 +138,97 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
   }, [images.length]);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (activeImageIndex === null) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-    const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) return;
-      isDraggingRef.current = true;
-      dragStartXRef.current = event.clientX;
-      dragStartOffsetRef.current = offsetRef.current;
-      container.setPointerCapture(event.pointerId);
-    };
-
-    const handlePointerMove = (event: PointerEvent) => {
-      if (!isDraggingRef.current) return;
-      const width = contentWidthRef.current;
-      const delta = event.clientX - dragStartXRef.current;
-      let nextOffset = dragStartOffsetRef.current + delta;
-
-      if (width > 0) {
-        if (nextOffset <= -width) {
-          nextOffset += width;
-          dragStartOffsetRef.current += width;
-          dragStartXRef.current = event.clientX;
-        } else if (nextOffset > 0) {
-          nextOffset -= width;
-          dragStartOffsetRef.current -= width;
-          dragStartXRef.current = event.clientX;
-        }
-      }
-
-      offsetRef.current = nextOffset;
-    };
-
-    const stopDragging = (event: PointerEvent) => {
-      if (!isDraggingRef.current) return;
-      isDraggingRef.current = false;
-      if (container.hasPointerCapture(event.pointerId)) {
-        container.releasePointerCapture(event.pointerId);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveImageIndex(null);
       }
     };
 
-    container.addEventListener("pointerdown", handlePointerDown);
-    container.addEventListener("pointermove", handlePointerMove);
-    container.addEventListener("pointerup", stopDragging);
-    container.addEventListener("pointercancel", stopDragging);
-    container.addEventListener("pointerleave", stopDragging);
-
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      container.removeEventListener("pointerdown", handlePointerDown);
-      container.removeEventListener("pointermove", handlePointerMove);
-      container.removeEventListener("pointerup", stopDragging);
-      container.removeEventListener("pointercancel", stopDragging);
-      container.removeEventListener("pointerleave", stopDragging);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [activeImageIndex]);
 
   if (!images.length) {
     return null;
   }
 
+  const activeImageSrc =
+    activeImageIndex !== null ? images[activeImageIndex] : null;
+  const activeImageAlt =
+    activeImageIndex !== null
+      ? (alts[activeImageIndex] ?? nameLabel)
+      : nameLabel;
+
   return (
     <div className="my-16">
-      <div
-        ref={containerRef}
-        className="relative overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing"
-      >
+      <div ref={containerRef} className="relative overflow-hidden">
         <div
           ref={trackRef}
-          className="flex w-max gap-6 will-change-transform"
+          className="flex w-max gap-2.5 will-change-transform"
           aria-live="off"
         >
-          <div ref={groupRef} className="flex w-max gap-6">
-            {images.map((src, index) => (
-              <div
-                key={`marquee-card-${src}-${index}`}
-                className="relative aspect-4/3 w-[260px] sm:w-[320px] lg:w-[360px] flex-none overflow-hidden rounded-[10px] bg-neutral-100"
-              >
-                <Image
-                  src={src}
-                  alt={alts[index] ?? nameLabel}
-                  fill
-                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 320px, 260px"
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
-          <div aria-hidden="true" className="flex w-max gap-6">
-            {images.map((src, index) => (
-              <div
-                key={`marquee-card-clone-${src}-${index}`}
-                className="relative aspect-4/3 w-[260px] sm:w-[320px] lg:w-[360px] flex-none overflow-hidden rounded-[10px] bg-neutral-100"
-              >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 320px, 260px"
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          {Array.from({ length: cloneCount }).map((_, groupIndex) => (
+            <div
+              key={`marquee-group-${groupIndex}`}
+              ref={groupIndex === 0 ? groupRef : null}
+              className="flex w-max gap-2.5"
+            >
+              {images.map((src, index) => (
+                <button
+                  key={`marquee-card-${groupIndex}-${src}-${index}`}
+                  type="button"
+                  onClick={() => setActiveImageIndex(index)}
+                  className="relative aspect-3/4 w-[350px]  lg:w-[540px] flex-none overflow-hidden  bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
+                >
+                  <Image
+                    src={src}
+                    alt={alts[index] ?? nameLabel}
+                    fill
+                    sizes="(min-width: 1024px) 240px, (min-width: 640px) 220px, 200px"
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
+      {activeImageSrc ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] p-6"
+          onClick={() => setActiveImageIndex(null)}
+        >
+          <div
+            className="relative h-[85vh] w-full max-w-6xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Close full screen"
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              onClick={() => setActiveImageIndex(null)}
+            >
+              X
+            </button>
+            <Image
+              src={activeImageSrc}
+              alt={activeImageAlt}
+              fill
+              sizes="100vw"
+              className="object-contain"
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -233,12 +239,18 @@ export default function DesignProjectPage({
   imageGroupTwo,
   imageOneAlt,
   imageTwoAlt,
+  previousProject,
+  nextProject,
 }: DesignProjectPageProps) {
   const scopeValue = project.Scope?.trim();
   const scopeLabel = scopeValue || "Project";
   const nameLabel = project.Name?.trim() || "Project";
   const imageOneKey = imageGroupOne.join("|") || "group-one";
   const imageTwoKey = imageGroupTwo.join("|") || "group-two";
+  const navBaseClasses =
+    "inline-flex items-center gap-3 border border-black px-4 py-2 text-sm font-medium uppercase tracking-wide transition hover:bg-black hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:border-white dark:hover:bg-white dark:hover:text-black dark:focus-visible:ring-white";
+  const navDisabledClasses =
+    "inline-flex items-center gap-3 border border-black px-4 py-2 text-sm font-medium uppercase tracking-wide opacity-40 dark:border-white";
 
   return (
     <div className=" mt-32">
@@ -338,7 +350,7 @@ export default function DesignProjectPage({
         nameLabel={nameLabel}
       />
       {/* Title 1 */}
-      <div className="width-max md:my-16">
+      <div className="width-max md:my-16 mt-16">
         <p className="common-heading mb-10 md:my-16 text-center md:text-left">
           {project.Title_1}
         </p>
@@ -351,6 +363,39 @@ export default function DesignProjectPage({
         alts={imageTwoAlt}
         nameLabel={nameLabel}
       />
+      <div className="width-max mt-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {previousProject.isAvailable ? (
+            <Link
+              href={previousProject.href}
+              className={navBaseClasses}
+              aria-label={`Previous Project: ${previousProject.label}`}
+              title={previousProject.label}
+            >
+              ← Previous Project
+            </Link>
+          ) : (
+            <span className={navDisabledClasses} aria-disabled="true">
+              ← Previous Project
+            </span>
+          )}
+          {nextProject.isAvailable ? (
+            <Link
+              href={nextProject.href}
+              className={navBaseClasses}
+              aria-label={`Next Project: ${nextProject.label}`}
+              title={nextProject.label}
+            >
+              Next Project →
+            </Link>
+          ) : (
+            <span className={navDisabledClasses} aria-disabled="true">
+              Next Project →
+            </span>
+          )}
+        </div>
+        <div className="border-b dark:border-color-[#B3B4B4] mt-8"></div>
+      </div>
       <Conversations />
     </div>
   );

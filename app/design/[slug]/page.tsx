@@ -53,6 +53,14 @@ const toKebabCase = (value?: string | null) => {
     .replace(/(^-|-$)/g, "");
 };
 
+const buildProjectSlug = (project: Pick<ProjectRecord, "slug" | "Name" | "id">) => {
+  const slug = safeTrim(project.slug);
+  if (slug) return slug;
+  const fromName = toKebabCase(project.Name);
+  if (fromName) return fromName;
+  return project.id ?? "";
+};
+
 const getSiteUrl = () => {
   const fromEnv =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -227,6 +235,37 @@ const fetchProjectBySlug = cache(async (slug: string) => {
     return data.items?.[0] ?? null;
   } catch {
     return null as ProjectRecord | null;
+  }
+});
+
+const fetchProjectsByScope = cache(async (scope: string) => {
+  const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);
+  if (!normalizedBaseUrl || !scope) {
+    return [] as ProjectRecord[];
+  }
+
+  const safeScope = String(scope).replace(/'/g, "\\'");
+  const filter = `(Scope='${safeScope}')`;
+  const params = new URLSearchParams({
+    filter,
+    perPage: "200",
+    sort: "created",
+  });
+
+  try {
+    const response = await fetch(
+      `${normalizedBaseUrl}/api/collections/${PROJECT_COLLECTION}/records?${params.toString()}`,
+      process.env.NODE_ENV === "development"
+        ? { cache: "no-store" }
+        : { next: { revalidate: 21600 } },
+    );
+    if (!response.ok) {
+      return [] as ProjectRecord[];
+    }
+    const data = (await response.json()) as PBListResponse<ProjectRecord>;
+    return data.items ?? [];
+  } catch {
+    return [] as ProjectRecord[];
   }
 });
 
@@ -422,6 +461,45 @@ export default async function Page({ params }: PageProps) {
   const imageOneAlt = buildAltList(imageGroupOne, imageOneAltSource, altBase);
   const imageTwoAlt = buildAltList(imageGroupTwo, imageTwoAltSource, altBase);
 
+  const scopeValue = safeTrim(project.Scope);
+  const scopedProjects = scopeValue
+    ? await fetchProjectsByScope(scopeValue)
+    : [];
+  const scopedIndex = scopedProjects.findIndex((item) => item.id === project.id);
+  const fallbackScopedIndex =
+    scopedIndex === -1
+      ? scopedProjects.findIndex(
+          (item) =>
+            safeTrim(item.slug) === safeTrim(project.slug) ||
+            safeTrim(item.Name) === safeTrim(project.Name),
+        )
+      : scopedIndex;
+  const resolvedScopedIndex =
+    scopedProjects.length > 0
+      ? (fallbackScopedIndex + scopedProjects.length) % scopedProjects.length
+      : -1;
+  const canNavigateScope = scopedProjects.length > 1 && resolvedScopedIndex >= 0;
+  const previousProject = canNavigateScope
+    ? scopedProjects[
+        (resolvedScopedIndex - 1 + scopedProjects.length) %
+          scopedProjects.length
+      ]
+    : null;
+  const nextProject = canNavigateScope
+    ? scopedProjects[(resolvedScopedIndex + 1) % scopedProjects.length]
+    : null;
+
+  const previousProjectHref = previousProject
+    ? `/design/${encodeURIComponent(buildProjectSlug(previousProject))}`
+    : "";
+  const nextProjectHref = nextProject
+    ? `/design/${encodeURIComponent(buildProjectSlug(nextProject))}`
+    : "";
+
+  const previousProjectLabel =
+    previousProject?.Name?.trim() || "Previous Project";
+  const nextProjectLabel = nextProject?.Name?.trim() || "Next Project";
+
   const keywords = buildKeywords(project, locationTokens.keywords);
   const jsonLd = buildJsonLd(
     project,
@@ -441,6 +519,16 @@ export default async function Page({ params }: PageProps) {
         imageGroupTwo={imageGroupTwo}
         imageOneAlt={imageOneAlt}
         imageTwoAlt={imageTwoAlt}
+        previousProject={{
+          href: previousProjectHref,
+          label: previousProjectLabel,
+          isAvailable: Boolean(previousProjectHref),
+        }}
+        nextProject={{
+          href: nextProjectHref,
+          label: nextProjectLabel,
+          isAvailable: Boolean(nextProjectHref),
+        }}
       />
     </>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Conversations() {
   return (
-    <section className="width-max block py-24 gap-10">
+    <section className="width-max block py-12 gap-10">
       <div className="font-sans font-light text-3xl md:text-5xl w-full md:pl-8">
         <h3>
           <span className="block md:pl-24">
