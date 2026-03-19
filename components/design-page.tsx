@@ -23,6 +23,8 @@ export default function ProjectsPage() {
               alt="Hero"
               fill
               sizes="100vw"
+              quality={95}
+              priority
               className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000"
             />
             <div className="width-max">
@@ -93,3 +95,4 @@ export default function ProjectsPage() {
     </div>
   );
 }
+

@@ -31,7 +31,7 @@ const DEFAULT_SITE_METADATA: Metadata = {
   description: DEFAULT_SITE_DESCRIPTION,
 };
 
-const DEFAULT_OG_IMAGE = "/hero_vva.png";
+const DEFAULT_OG_IMAGE = "/hero_vva.webp";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
 

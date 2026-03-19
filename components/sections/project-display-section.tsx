@@ -26,7 +26,7 @@ const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const PB_DEBUG = process.env.NEXT_PUBLIC_DEBUG_PB === "1";
 const POCKETBASE_COLLECTION = "project";
 const PROJECTS_PER_PAGE = 200;
-const FALLBACK_IMAGE = "/1.png";
+const FALLBACK_IMAGE = "/1.webp";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
 const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);

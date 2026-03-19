@@ -191,7 +191,7 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
                     src={src}
                     alt={alts[index] ?? nameLabel}
                     fill
-                    sizes="(min-width: 1024px) 240px, (min-width: 640px) 220px, 200px"
+                    sizes="(min-width: 1024px) 540px, (min-width: 640px) 350px, 85vw"
                     className="object-cover"
                   />
                 </button>
@@ -245,6 +245,20 @@ export default function DesignProjectPage({
   const scopeValue = project.Scope?.trim();
   const scopeLabel = scopeValue || "Project";
   const nameLabel = project.Name?.trim() || "Project";
+  const introText = project.Intro?.trim();
+  const titleOne = project.Title_1?.trim();
+  const fieldOne = project.field_1?.trim();
+  const metaItems = [
+    ["LOCATION", project.Location?.trim()],
+    ["SECTOR", project.Sector?.trim()],
+    ["YEAR", project.Year?.trim()],
+    ["SCOPE", project.Scope?.trim()],
+  ].filter((item): item is [string, string] => Boolean(item[1]));
+  const hasIntro = Boolean(introText);
+  const hasMeta = metaItems.length > 0;
+  const hasTitleSection = Boolean(titleOne || fieldOne);
+  const hasImageGroupOne = imageGroupOne.length > 0;
+  const hasImageGroupTwo = imageGroupTwo.length > 0;
   const imageOneKey = imageGroupOne.join("|") || "group-one";
   const imageTwoKey = imageGroupTwo.join("|") || "group-two";
   const navBaseClasses =
@@ -311,58 +325,73 @@ export default function DesignProjectPage({
             }}
           />
         </div>
-        <div className="flex flex-col gap-10 md:flex-row md:gap-16 font-display font-light">
-          {/* Intro */}
-          <p className=" mt-8 md:mb-16 w-full md:w-3/5 text-base md:text-lg dark:text-white">
-            {project.Intro}
-          </p>
+        {hasIntro || hasMeta ? (
+          <div className="flex flex-col gap-10 md:flex-row md:gap-16 font-display font-light">
+            {/* Intro */}
+            {hasIntro ? (
+              <p
+                className={`mt-8 md:mb-16 w-full text-base md:text-lg dark:text-white ${
+                  hasMeta ? "md:w-3/5" : ""
+                }`}
+              >
+                {introText}
+              </p>
+            ) : null}
 
-          {/* Meta table */}
-          <div className="w-full md:w-2/5 md:mt-8">
-            <div className="border-t border-neutral-300">
-              {[
-                ["LOCATION", project.Location],
-                ["SECTOR", project.Sector],
-                ["YEAR", project.Year],
-                ["SCOPE", project.Scope],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="grid grid-cols-[220px_1fr] items-center gap-6 border-b border-neutral-300 py-3"
-                >
-                  <div className="text-xs font-medium tracking-wider dark:text-white">
-                    {label}
-                  </div>
-                  <div className="text-sm dark:text-white text-left">
-                    {value || "â€”"}
-                  </div>
+            {/* Meta table */}
+            {hasMeta ? (
+              <div className={`w-full md:mt-8 ${hasIntro ? "md:w-2/5" : ""}`}>
+                <div className="border-t border-neutral-300">
+                  {metaItems.map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="grid grid-cols-[220px_1fr] items-center gap-6 border-b border-neutral-300 py-3"
+                    >
+                      <div className="text-xs font-medium tracking-wider dark:text-white">
+                        {label}
+                      </div>
+                      <div className="text-sm dark:text-white text-left">
+                        {value}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : null}
           </div>
-        </div>
+        ) : null}
       </div>
       {/* Image 1 */}
-      <ImageCarousel
-        key={`image-group-one-${imageOneKey}`}
-        images={imageGroupOne}
-        alts={imageOneAlt}
-        nameLabel={nameLabel}
-      />
+      {hasImageGroupOne ? (
+        <ImageCarousel
+          key={`image-group-one-${imageOneKey}`}
+          images={imageGroupOne}
+          alts={imageOneAlt}
+          nameLabel={nameLabel}
+        />
+      ) : null}
       {/* Title 1 */}
-      <div className="width-max md:my-16 mt-16">
-        <p className="common-heading mb-10 md:my-16 text-center md:text-left">
-          {project.Title_1}
-        </p>
-        <p className="font-display text-xl font-light">{project.field_1}</p>
-      </div>
+      {hasTitleSection ? (
+        <div className="width-max md:my-16 mt-16">
+          {titleOne ? (
+            <p className="common-heading mb-10 md:my-16 text-center md:text-left">
+              {titleOne}
+            </p>
+          ) : null}
+          {fieldOne ? (
+            <p className="font-display text-xl font-light">{fieldOne}</p>
+          ) : null}
+        </div>
+      ) : null}
       {/* Image 2 */}
-      <ImageMarquee
-        key={`image-group-two-${imageTwoKey}`}
-        images={imageGroupTwo}
-        alts={imageTwoAlt}
-        nameLabel={nameLabel}
-      />
+      {hasImageGroupTwo ? (
+        <ImageMarquee
+          key={`image-group-two-${imageTwoKey}`}
+          images={imageGroupTwo}
+          alts={imageTwoAlt}
+          nameLabel={nameLabel}
+        />
+      ) : null}
       <div className="width-max mt-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {previousProject.isAvailable ? (
@@ -400,3 +429,4 @@ export default function DesignProjectPage({
     </div>
   );
 }
+

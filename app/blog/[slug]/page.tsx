@@ -289,7 +289,7 @@ const buildSeoFields = (
     siteUrl,
   );
   const seoImage =
-    heroImageUrl || bodyImage || new URL("/og-default.jpg", siteUrl).toString();
+    heroImageUrl || bodyImage || new URL("/og-default.webp", siteUrl).toString();
 
   const seoImageAlt =
     safeTrim(post.hero_image_alt) ||

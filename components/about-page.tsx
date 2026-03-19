@@ -94,6 +94,8 @@ export default function AboutPage() {
                 alt="Hero"
                 fill
                 sizes="100vw"
+                quality={95}
+                priority
                 className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000"
               />
             </div>
@@ -342,3 +344,4 @@ export default function AboutPage() {
     </main>
   );
 }
+

@@ -92,7 +92,7 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
   heading_1: "Our <em>Raison d'etre</em>",
   heading_3: "FEATURED <em>PROJECTS</em>",
   heading_4: "RESULTS THAT <em>MATCH YOUR VISION</em>",
-  hero_carausel: ["/hero_vva.png"],
+  hero_carausel: ["/hero_vva.webp"],
   hero_carausel_alt: ["Vivek Varma Architects hero image"],
   hero_text: "Crafting spatial narratives grounded in human experience",
   sub_hero_text:
@@ -102,15 +102,15 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
   specialization_1_title: "Interior Design",
   specialization_1_description:
     "Interior architecture for residential, commercial, and hospitality environments with a focus on material honesty, proportion, and experiential flow.",
-  specialization_1_image: "/interior.png",
+  specialization_1_image: "/interior.webp",
   specialization_2_title: "Architecture",
   specialization_2_description:
     "Complementary architectural design grounded in contextual clarity.",
-  specialization_2_image: "/Architecture.png",
+  specialization_2_image: "/Architecture.webp",
   specialization_3_title: "Space Design",
   specialization_3_description:
     "Spatial compositions that shape circulation, mood, and user experience.",
-  specialization_3_image: "/Space.png",
+  specialization_3_image: "/Space.webp",
 };
 
 const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
@@ -670,35 +670,35 @@ export default function HomePage() {
     title: "Project Name",
     client: "Client Name",
     year: "2024",
-    imageSrc: "/2.png",
+    imageSrc: "/2.webp",
     imageAlt: "Project Name",
   });
   const projectBlock2 = getProjectBlockDisplay(2, {
     title: "Project Name",
     client: "Client Name",
     year: "2023",
-    imageSrc: "/1.png",
+    imageSrc: "/1.webp",
     imageAlt: "Project Name",
   });
   const projectBlock3 = getProjectBlockDisplay(3, {
     title: "Project Name",
     client: "Client Name",
     year: "2022",
-    imageSrc: "/3.png",
+    imageSrc: "/3.webp",
     imageAlt: "Project Name",
   });
   const projectBlock4 = getProjectBlockDisplay(4, {
     title: "Project Name",
     client: "Client Name",
     year: "2021",
-    imageSrc: "/4.png",
+    imageSrc: "/4.webp",
     imageAlt: "Project Name",
   });
   const projectBlock5 = getProjectBlockDisplay(5, {
     title: "Project Name",
     client: "Client Name",
     year: "2020",
-    imageSrc: "/5.png",
+    imageSrc: "/5.webp",
     imageAlt: "Project Name",
   });
 
@@ -782,6 +782,7 @@ export default function HomePage() {
                   alt={heroAlts[index] || heroAltText}
                   fill
                   sizes="100vw"
+                  quality={95}
                   priority={index === 0}
                   className={`absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000 ${
                     index === heroIndex ? "opacity-100" : "opacity-0"

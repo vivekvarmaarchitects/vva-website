@@ -347,7 +347,7 @@ export default function OurWorksSection() {
           ) : (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
               {filteredProjects.map((project, index) => {
-                const imageUrl = resolveProjectImageUrl(project) ?? "/1.png";
+                const imageUrl = resolveProjectImageUrl(project) ?? "/1.webp";
                 return (
                   <FadeIn
                     key={project.id ?? project.slug ?? index}
