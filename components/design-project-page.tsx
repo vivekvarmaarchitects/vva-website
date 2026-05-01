@@ -242,8 +242,8 @@ export default function DesignProjectPage({
   previousProject,
   nextProject,
 }: DesignProjectPageProps) {
-  const scopeValue = project.Scope?.trim();
-  const scopeLabel = scopeValue || "Project";
+  const projectTypeValue = project.ProjectType?.trim();
+  const projectTypeLabel = projectTypeValue || "Project";
   const nameLabel = project.Name?.trim() || "Project";
   const introText = project.Intro?.trim();
   const titleOne = project.Title_1?.trim();
@@ -252,7 +252,7 @@ export default function DesignProjectPage({
     ["LOCATION", project.Location?.trim()],
     ["SECTOR", project.Sector?.trim()],
     ["YEAR", project.Year?.trim()],
-    ["SCOPE", project.Scope?.trim()],
+    ["PROJECT TYPE", project.ProjectType?.trim()],
   ].filter((item): item is [string, string] => Boolean(item[1]));
   const hasIntro = Boolean(introText);
   const hasMeta = metaItems.length > 0;
@@ -287,15 +287,18 @@ export default function DesignProjectPage({
               Design
             </Link>{" "}
             /{" "}
-            {scopeValue ? (
+            {projectTypeValue ? (
               <Link
-                href={{ pathname: "/design", query: { scope: scopeValue } }}
+                href={{
+                  pathname: "/design",
+                  query: { projectType: projectTypeValue },
+                }}
                 className="transition-colors hover:text-black/70 dark:hover:text-white/80"
               >
-                {scopeLabel}
+                {projectTypeLabel}
               </Link>
             ) : (
-              scopeLabel
+              projectTypeLabel
             )}{" "}
             / <span aria-current="page">{nameLabel}</span>
           </p>
@@ -429,4 +432,3 @@ export default function DesignProjectPage({
     </div>
   );
 }
-

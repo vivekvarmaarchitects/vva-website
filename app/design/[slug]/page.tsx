@@ -127,10 +127,10 @@ const buildSeoTitle = (
   brand: string,
 ) => {
   const name = safeTrim(project.Name);
-  const scope = safeTrim(project.Scope);
+  const projectType = safeTrim(project.ProjectType);
   let title = name;
-  if (scope) {
-    title = title ? `${title} - ${scope}` : scope;
+  if (projectType) {
+    title = title ? `${title} - ${projectType}` : projectType;
   }
   if (locationLabel) {
     title = title ? `${title} in ${locationLabel}` : locationLabel;
@@ -189,7 +189,7 @@ const buildAltList = (
 
 const buildKeywords = (project: ProjectRecord, locationKeywords: string[]) => {
   const items = [
-    safeTrim(project.Scope),
+    safeTrim(project.ProjectType),
     safeTrim(project.Sector),
     ...locationKeywords.map((item) => item.trim()),
     safeTrim(project.Year),
@@ -238,14 +238,14 @@ const fetchProjectBySlug = cache(async (slug: string) => {
   }
 });
 
-const fetchProjectsByScope = cache(async (scope: string) => {
+const fetchProjectsByProjectType = cache(async (projectType: string) => {
   const normalizedBaseUrl = normalizeBaseUrl(POCKETBASE_BASE_URL);
-  if (!normalizedBaseUrl || !scope) {
+  if (!normalizedBaseUrl || !projectType) {
     return [] as ProjectRecord[];
   }
 
-  const safeScope = String(scope).replace(/'/g, "\\'");
-  const filter = `(Scope='${safeScope}')`;
+  const safeProjectType = String(projectType).replace(/'/g, "\\'");
+  const filter = `(ProjectType='${safeProjectType}')`;
   const params = new URLSearchParams({
     filter,
     perPage: "200",
@@ -354,9 +354,9 @@ const buildJsonLd = (
   keywords: string[],
 ) => {
   const name = safeTrim(project.Name);
-  const scope = safeTrim(project.Scope);
+  const projectType = safeTrim(project.ProjectType);
   const sector = safeTrim(project.Sector);
-  const about = [scope, sector].filter(Boolean);
+  const about = [projectType, sector].filter(Boolean);
   const year = safeTrim(project.Year);
   const dateCreated = /^\d{4}$/.test(year) ? year : "";
   const locationLabel =
@@ -461,9 +461,9 @@ export default async function Page({ params }: PageProps) {
   const imageOneAlt = buildAltList(imageGroupOne, imageOneAltSource, altBase);
   const imageTwoAlt = buildAltList(imageGroupTwo, imageTwoAltSource, altBase);
 
-  const scopeValue = safeTrim(project.Scope);
-  const scopedProjects = scopeValue
-    ? await fetchProjectsByScope(scopeValue)
+  const projectTypeValue = safeTrim(project.ProjectType);
+  const scopedProjects = projectTypeValue
+    ? await fetchProjectsByProjectType(projectTypeValue)
     : [];
   const scopedIndex = scopedProjects.findIndex((item) => item.id === project.id);
   const fallbackScopedIndex =

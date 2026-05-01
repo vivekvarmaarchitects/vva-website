@@ -23,7 +23,7 @@ export type ProjectRecord = {
   Location?: string;
   Sector?: string;
   Year?: string;
-  Scope?: string;
+  ProjectType?: string;
   Image_1?: string[] | string;
   Image_2?: string[] | string;
   Title_1?: string;

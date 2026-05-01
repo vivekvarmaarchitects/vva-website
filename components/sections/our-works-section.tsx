@@ -17,7 +17,7 @@ type ProjectRecord = {
   arc_window?: boolean;
   Location?: string;
   Year?: string;
-  Scope?: string;
+  ProjectType?: string;
 };
 
 type PBListResponse<T> = {
@@ -76,8 +76,8 @@ const toTabSlug = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-const buildTabs = (scopes: string[]): Tab[] => {
-  const values = [ALL_TAB, ...scopes];
+const buildTabs = (projectTypes: string[]): Tab[] => {
+  const values = [ALL_TAB, ...projectTypes];
   return values.map((value) => {
     const slug = toTabSlug(value);
     return {
@@ -94,7 +94,7 @@ const LOADING_CARDS = Array.from({ length: 6 }, (_, index) => ({
   arcWindow: index % 2 === 0,
 }));
 
-const SCOPE_DESCRIPTIONS: Record<string, string> = {
+const PROJECT_TYPE_DESCRIPTIONS: Record<string, string> = {
   Interior:
     "Our interior design work spans private residences, commercial environments, hospitality spaces, and large-scale developer-led projects, shaped through material exploration and experiential clarity.",
   Architecture:
@@ -164,7 +164,11 @@ export default function OurWorksSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const scopeParam = (searchParams.get("scope") ?? "").trim();
+  const projectTypeParam = (
+    searchParams.get("projectType") ??
+    searchParams.get("scope") ??
+    ""
+  ).trim();
 
   const projectListUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records?${new URLSearchParams(
     {
@@ -221,43 +225,43 @@ export default function OurWorksSection() {
     };
   }, [projectListUrl]);
 
-  const scopes = useMemo(() => {
+  const projectTypes = useMemo(() => {
     const seen = new Set<string>();
     const ordered: string[] = [];
     projects.forEach((project) => {
-      const scope = project.Scope?.trim();
-      if (scope && !seen.has(scope)) {
-        seen.add(scope);
-        ordered.push(scope);
+      const projectType = project.ProjectType?.trim();
+      if (projectType && !seen.has(projectType)) {
+        seen.add(projectType);
+        ordered.push(projectType);
       }
     });
     return ordered;
   }, [projects]);
 
-  const tabs = useMemo(() => buildTabs(scopes), [scopes]);
+  const tabs = useMemo(() => buildTabs(projectTypes), [projectTypes]);
 
   useEffect(() => {
-    if (!scopeParam) {
+    if (!projectTypeParam) {
       return;
     }
     const match =
-      scopes.find(
-        (scope) =>
-          toTabSlug(scope) === toTabSlug(scopeParam) ||
-          scope.toLowerCase() === scopeParam.toLowerCase(),
+      projectTypes.find(
+        (projectType) =>
+          toTabSlug(projectType) === toTabSlug(projectTypeParam) ||
+          projectType.toLowerCase() === projectTypeParam.toLowerCase(),
       ) ?? null;
     if (match) {
       setActive((prev) => (prev === match ? prev : match));
     } else {
       setActive((prev) => (prev === ALL_TAB ? prev : ALL_TAB));
     }
-  }, [scopeParam, scopes]);
+  }, [projectTypeParam, projectTypes]);
 
   useEffect(() => {
-    if (active !== ALL_TAB && !scopes.includes(active)) {
+    if (active !== ALL_TAB && !projectTypes.includes(active)) {
       setActive(ALL_TAB);
     }
-  }, [active, scopes]);
+  }, [active, projectTypes]);
 
   const activeTab = tabs.find((tab) => tab.key === active) ?? tabs[0];
 
@@ -265,17 +269,17 @@ export default function OurWorksSection() {
     if (active === ALL_TAB) {
       return projects;
     }
-    return projects.filter((project) => project.Scope?.trim() === active);
+    return projects.filter((project) => project.ProjectType?.trim() === active);
   }, [active, projects]);
 
-  const activeDescription = SCOPE_DESCRIPTIONS[active] ?? "";
+  const activeDescription = PROJECT_TYPE_DESCRIPTIONS[active] ?? "";
 
   return (
     <section className="width-max">
       <div className="mx-auto">
         <div
           role="tablist"
-          aria-label="Project scopes"
+          aria-label="Project types"
           className="inline-flex w-full flex-wrap items-center justify-center gap-2"
         >
           {tabs.map((tab) => {

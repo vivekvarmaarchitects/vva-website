@@ -194,7 +194,7 @@ export default function PublicationSection() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-6 flex flex-col gap-4 ">
+                  <div className="p-6 flex flex-1 flex-col gap-4">
                     <div className="flex items-center gap-4">
                       <span className="px-3 py-1 bg-black dark:bg-white dark:text-black text-white text-xs uppercase tracking-wide font-bold">
                         {post.category ?? "Blog"}
@@ -208,13 +208,13 @@ export default function PublicationSection() {
                       {post.title ?? "Untitled blog"}
                     </h3>
 
-                    <p className="dark:text-white text-sm leading-relaxed">
+                    <p className="mt-auto dark:text-white text-sm leading-relaxed">
                       {summary}
                     </p>
                   </div>
 
                   {/* Footer */}
-                  <div className="border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
+                  <div className="mt-auto border-t border-neutral-200 px-6 py-4 flex justify-between text-sm dark:text-[#B3B4B4]">
                     <span>Written by</span>
                     <span>{post.author ?? "-"}</span>
                   </div>

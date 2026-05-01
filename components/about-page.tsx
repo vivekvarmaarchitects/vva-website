@@ -156,11 +156,11 @@ export default function AboutPage() {
             >
               <div ref={vivekImageRef}>
                 <Image
-                  src="/about/about_1.webp"
+                  src="/about/vivek_verma_portrait.webp"
                   alt="The creators"
                   width={800}
                   height={1200}
-                  className="w-full h-auto"
+                  className="h-auto w-full grayscale"
                 />
               </div>
             </FadeIn>
@@ -344,4 +344,3 @@ export default function AboutPage() {
     </main>
   );
 }
-
