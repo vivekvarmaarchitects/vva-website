@@ -1,7 +1,5 @@
 // TODO: ADD GST NUMBER
 // TODO: LINK SOCIAL MEDIA ICONS
-// TODO: link Angle website
-
 "use client";
 
 import { ThemeProvider } from "next-themes";
@@ -79,20 +77,43 @@ export function SiteFooter() {
       {/* BOTTOM ROW */}
       <div className="flex flex-col md:flex-row justify-between md:items-center mt-12 md:mt-24 width-max">
         <p className="text-sm tracking-wider">
-          Vivek Varma Architects © 2025. <br></br>All Rights Reserved.
+          Vivek Varma Architects © 2026. <br></br>All Rights Reserved.
         </p>
 
-        <p className="text-sm tracking-wider my-4 md:my-0">GSTIN:</p>
+        {/* <p className="text-sm tracking-wider my-4 md:my-0">GSTIN:</p> */}
 
         {/* SOCIAL ICONS */}
         <div className="flex space-x-6 text-xl">
-          <FaFacebookF className="cursor-pointer hover:opacity-60 transition" />
-          <FaLinkedinIn className="cursor-pointer hover:opacity-60 transition" />
-          <FaInstagram className="cursor-pointer hover:opacity-60 transition" />
+          {/* <FaFacebookF className="cursor-pointer hover:opacity-60 transition" /> */}
+          <Link
+            href="https://www.linkedin.com/company/vivek-varma-architects/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Vivek Varma Architects on LinkedIn"
+          >
+            <FaLinkedinIn className="cursor-pointer hover:opacity-60 transition" />
+          </Link>
+          <Link
+            href="https://www.instagram.com/vivekvarmaarchitect?igsh=Mnc5NnUyMjg4ZW1i"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Vivek Varma Architects on Instagram"
+          >
+            <FaInstagram className="cursor-pointer hover:opacity-60 transition" />
+          </Link>
         </div>
 
         <p className="text-sm tracking-wider mt-4 md:mt-0">
-          Website Credits. Angle.
+          Website Credits.{" "}
+          <Link
+            href="https://www.angle.services/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-opacity hover:opacity-70"
+          >
+            Angle
+          </Link>
+          .
         </p>
       </div>
 

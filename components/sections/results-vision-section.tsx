@@ -64,7 +64,8 @@ const DEFAULT_RECORD: NumbersAndTestimonialsRecord = {
 };
 
 // Env-driven PB settings so staging/prod can swap without code changes.
-const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
+const POCKETBASE_BASE_URL =
+  process.env.NEXT_PUBLIC_POCKETBASE_URL || "https://staging.angle.services";
 const POCKETBASE_COLLECTION = "numbers_and_testimonials";
 const POCKETBASE_RECORD_ID =
   process.env.NEXT_PUBLIC_PB_NUMBERS_TESTIMONIALS_ID ?? "lphz7j9p1wcglox";
@@ -79,7 +80,7 @@ const POCKETBASE_REFRESH_MS = (() => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 })();
 // Cache keys for client-side throttling across refreshes.
-const POCKETBASE_CACHE_KEY = `pb:${POCKETBASE_COLLECTION}:${POCKETBASE_RECORD_ID}`;
+const POCKETBASE_CACHE_KEY = `pb:${POCKETBASE_COLLECTION}:${POCKETBASE_RECORD_ID}:v3`;
 const POCKETBASE_CACHE_TS_KEY = `${POCKETBASE_CACHE_KEY}:ts`;
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
@@ -129,6 +130,16 @@ const stripOuterParagraph = (value?: string) => {
   return trimmed;
 };
 
+const firstNonEmpty = (...values: Array<string | undefined>) => {
+  for (const value of values) {
+    const trimmed = value?.trim();
+    if (trimmed) {
+      return trimmed;
+    }
+  }
+  return "";
+};
+
 export default function ResultsVisionSection({
   headingHtml,
 }: ResultsVisionSectionProps) {
@@ -151,7 +162,6 @@ export default function ResultsVisionSection({
   useEffect(() => {
     let active = true;
     let intervalId: number | null = null;
-    let timeoutId: number | null = null;
     let cacheTimeoutId: number | null = null;
 
     // Read cached record + timestamp so refresh doesn't trigger immediate refetch.
@@ -180,14 +190,14 @@ export default function ResultsVisionSection({
       }
     };
 
-    // Fetch PB, merge defaults, update state + cache.
+    // Fetch PB, update state + cache. Keep API data unmerged so missing fields
+    // do not mask typo-field fallbacks like auther_5/auther_6.
     const load = async () => {
       try {
         const data = await fetchRecord();
         if (active && data) {
-          const merged = { ...DEFAULT_RECORD, ...data };
-          setRecord(merged);
-          writeCache(merged);
+          setRecord(data);
+          writeCache(data);
         }
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {
@@ -198,44 +208,24 @@ export default function ResultsVisionSection({
 
     const cached = readCache();
     if (cached?.data) {
-      const merged = { ...DEFAULT_RECORD, ...cached.data };
       // Schedule cache hydration to avoid sync setState in effect.
       cacheTimeoutId = window.setTimeout(() => {
         if (active) {
-          setRecord(merged);
+          setRecord(cached.data);
         }
       }, 0);
     }
 
-    // Respect refresh interval across reloads; avoid immediate re-fetch.
+    // Hydrate from cache immediately, then always revalidate in the background.
+    load();
     if (POCKETBASE_REFRESH_MS > 0) {
-      const lastTs = cached?.ts ?? 0;
-      const age = lastTs ? Date.now() - lastTs : Number.POSITIVE_INFINITY;
-      const shouldFetchNow = !cached?.data || age >= POCKETBASE_REFRESH_MS;
-      const remaining = Math.max(POCKETBASE_REFRESH_MS - age, 0);
-
-      if (shouldFetchNow) {
-        load();
-      }
-
-      timeoutId = window.setTimeout(
-        () => {
-          load();
-          intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
-        },
-        shouldFetchNow ? POCKETBASE_REFRESH_MS : remaining,
-      );
-    } else {
-      load();
+      intervalId = window.setInterval(load, POCKETBASE_REFRESH_MS);
     }
 
     return () => {
       active = false;
       if (intervalId !== null) {
         window.clearInterval(intervalId);
-      }
-      if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
       }
       if (cacheTimeoutId !== null) {
         window.clearTimeout(cacheTimeoutId);
@@ -269,29 +259,29 @@ export default function ResultsVisionSection({
   const testimonials = [
     {
       body: record.body_3 ?? DEFAULT_RECORD.body_3 ?? "",
-      author: record.authorName_3 ?? DEFAULT_RECORD.authorName_3 ?? "",
+      author: firstNonEmpty(record.authorName_3, DEFAULT_RECORD.authorName_3),
       role: record.authorRole_3 ?? DEFAULT_RECORD.authorRole_3 ?? "",
       logo: buildFileUrl(record, record.logo_3),
     },
     {
       body: record.body_5 ?? DEFAULT_RECORD.body_5 ?? "",
-      author:
-        record.authorName_5 ??
-        record.auther_5 ??
-        DEFAULT_RECORD.authorName_5 ??
-        DEFAULT_RECORD.auther_5 ??
-        "",
+      author: firstNonEmpty(
+        record.authorName_5,
+        record.auther_5,
+        DEFAULT_RECORD.authorName_5,
+        DEFAULT_RECORD.auther_5,
+      ),
       role: record.authorRole_5 ?? DEFAULT_RECORD.authorRole_5 ?? "",
       logo: buildFileUrl(record, record.logo_5),
     },
     {
       body: record.body_7 ?? DEFAULT_RECORD.body_7 ?? "",
-      author:
-        record.authorName_6 ??
-        record.auther_6 ??
-        DEFAULT_RECORD.authorName_6 ??
-        DEFAULT_RECORD.auther_6 ??
-        "",
+      author: firstNonEmpty(
+        record.authorName_6,
+        record.auther_6,
+        DEFAULT_RECORD.authorName_6,
+        DEFAULT_RECORD.auther_6,
+      ),
       role: record.authorRole_6 ?? DEFAULT_RECORD.authorRole_6 ?? "",
       logo: buildFileUrl(record, record.logo_6),
     },
