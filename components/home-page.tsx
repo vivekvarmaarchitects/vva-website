@@ -66,17 +66,28 @@ type HomepageProjectRecord = {
   collectionName?: string;
   id?: string;
   index?: number | string;
-  Project_Name?: string;
+  Project_Name?: string | string[] | null;
   Client_name?: string;
   Year?: string | number;
+  custom_image_optional?: string;
   Image?: string;
   Image_alt?: string;
   Slug?: string | string[] | null;
+  expand?: HomepageProjectExpand | null;
 };
 
-type ProjectSlugRecord = {
+type LinkedProjectRecord = {
+  collectionId?: string;
   id?: string;
+  Name?: string;
   slug?: string;
+  seo_image?: string | string[];
+  seo_image_alt?: string;
+};
+
+type HomepageProjectExpand = {
+  Project_Name?: LinkedProjectRecord | LinkedProjectRecord[] | null;
+  Slug?: LinkedProjectRecord | LinkedProjectRecord[] | null;
 };
 
 type ProjectBlockDisplay = {
@@ -85,6 +96,7 @@ type ProjectBlockDisplay = {
   year: string;
   imageSrc: string;
   imageAlt: string;
+  imageAspectClassName: string;
   href?: string;
 };
 
@@ -117,7 +129,6 @@ const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
 const PB_DEBUG = process.env.NEXT_PUBLIC_DEBUG_PB === "1";
 const POCKETBASE_COLLECTION = "homepage";
 const HOMEPAGE_PROJECTS_COLLECTION = "homepage_projects";
-const PROJECT_COLLECTION = "project";
 const HOMEPAGE_PROJECTS_PER_PAGE = 200;
 const POCKETBASE_RECORD_ID =
   process.env.NEXT_PUBLIC_PB_HOMEPAGE_ID ?? "zreceve3mfdgrh3";
@@ -196,6 +207,8 @@ const normalizeIndexValue = (value?: number | string | null) => {
   return null;
 };
 
+const isLikelyPocketBaseId = (value: string) => /^[a-z0-9]{15}$/i.test(value);
+
 const resolveImageUrl = (record: HomepageRecord, value?: string) => {
   if (!value) {
     return null;
@@ -241,6 +254,44 @@ const resolveProjectBlockImageUrl = (
   }
   const encodedName = encodeURIComponent(trimmed);
   return `${normalizedBaseUrl}/api/files/${record.collectionId}/${record.id}/${encodedName}`;
+};
+
+const getFileName = (value?: string | string[] | null) => {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return value ?? null;
+};
+
+const resolveLinkedProjectImageUrl = (record?: LinkedProjectRecord | null) => {
+  if (!record) {
+    return null;
+  }
+  const filename = getFileName(record.seo_image)?.trim();
+  if (!filename) {
+    return null;
+  }
+  if (
+    filename.startsWith("http://") ||
+    filename.startsWith("https://") ||
+    filename.startsWith("/")
+  ) {
+    return filename;
+  }
+  if (!record.collectionId || !record.id) {
+    return null;
+  }
+  const encodedName = encodeURIComponent(filename);
+  return `${normalizedBaseUrl}/api/files/${record.collectionId}/${record.id}/${encodedName}`;
+};
+
+const normalizeExpandedProject = (
+  value?: LinkedProjectRecord | LinkedProjectRecord[] | null,
+) => {
+  if (!value) {
+    return null;
+  }
+  return Array.isArray(value) ? (value[0] ?? null) : value;
 };
 
 const parseJson = <T,>(value: unknown) => {
@@ -289,9 +340,6 @@ export default function HomePage() {
   const [projectBlocks, setProjectBlocks] = React.useState<
     HomepageProjectRecord[]
   >([]);
-  const [projectSlugMap, setProjectSlugMap] = React.useState<
-    Record<string, string>
-  >({});
   const [pbError, setPbError] = React.useState<string | null>(null);
 
   const recordUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records/${POCKETBASE_RECORD_ID}`;
@@ -299,6 +347,7 @@ export default function HomePage() {
     {
       perPage: String(HOMEPAGE_PROJECTS_PER_PAGE),
       sort: "index",
+      expand: "Project_Name,Slug",
     },
   ).toString()}`;
 
@@ -411,67 +460,6 @@ export default function HomePage() {
     let active = true;
     const controller = new AbortController();
 
-    const loadProjectSlugs = async (slugIds: string[]) => {
-      if (!slugIds.length) {
-        if (active) {
-          setProjectSlugMap({});
-        }
-        return;
-      }
-
-      try {
-        const results = await Promise.all(
-          slugIds.map(async (slugId) => {
-            try {
-              const response = await fetch(
-                `${normalizedBaseUrl}/api/collections/${PROJECT_COLLECTION}/records/${slugId}`,
-                { signal: controller.signal, cache: "no-store" },
-              );
-              if (!response.ok) {
-                return null;
-              }
-              const data = (await response.json()) as ProjectSlugRecord;
-              const slug = data.slug?.trim();
-              if (!slug) {
-                return null;
-              }
-              return { slugId, slug };
-            } catch (error) {
-              if (
-                typeof error === "object" &&
-                error !== null &&
-                "name" in error &&
-                (error as { name?: string }).name === "AbortError"
-              ) {
-                return null;
-              }
-              return null;
-            }
-          }),
-        );
-
-        if (!active) {
-          return;
-        }
-        const nextMap: Record<string, string> = {};
-        results.forEach((item) => {
-          if (item) {
-            nextMap[item.slugId] = item.slug;
-          }
-        });
-        setProjectSlugMap(nextMap);
-      } catch (error) {
-        if (
-          typeof error === "object" &&
-          error !== null &&
-          "name" in error &&
-          (error as { name?: string }).name === "AbortError"
-        ) {
-          return;
-        }
-      }
-    };
-
     const load = async () => {
       try {
         const response = await fetch(homepageProjectsUrl, {
@@ -488,14 +476,6 @@ export default function HomePage() {
           return;
         }
         setProjectBlocks(items);
-        const slugIds = Array.from(
-          new Set(
-            items
-              .map((item) => normalizeRelationId(item.Slug).trim())
-              .filter(Boolean),
-          ),
-        );
-        await loadProjectSlugs(slugIds);
       } catch (error) {
         if (
           typeof error === "object" &&
@@ -636,22 +616,34 @@ export default function HomePage() {
       if (!record) {
         return fallback;
       }
-      const title = record.Project_Name?.trim() || fallback.title;
-      const client = record.Client_name?.trim() || fallback.client;
+      const expandedProject = normalizeExpandedProject(
+        record.expand?.Project_Name,
+      );
+      const expandedSlugProject = normalizeExpandedProject(record.expand?.Slug);
+      const relatedProject = expandedProject ?? expandedSlugProject;
+      const rawProjectName = normalizeRelationId(record.Project_Name).trim();
+      const title =
+        relatedProject?.Name?.trim() ||
+        (!isLikelyPocketBaseId(rawProjectName) ? rawProjectName : "") ||
+        fallback.title;
+      const client = record.Client_name?.trim() ?? "";
       const yearValue =
         record.Year !== undefined && record.Year !== null
           ? String(record.Year).trim()
           : "";
-      const year = yearValue || fallback.year;
+      const year = yearValue;
       const imageSrc =
-        resolveProjectBlockImageUrl(record, record.Image) ?? fallback.imageSrc;
+        resolveProjectBlockImageUrl(record, record.custom_image_optional) ??
+        resolveLinkedProjectImageUrl(relatedProject) ??
+        fallback.imageSrc;
       const imageAlt =
+        relatedProject?.seo_image_alt?.trim() ||
         record.Image_alt?.trim() ||
-        record.Project_Name?.trim() ||
+        relatedProject?.Name?.trim() ||
+        (!isLikelyPocketBaseId(rawProjectName) ? rawProjectName : "") ||
         fallback.imageAlt ||
         fallback.title;
-      const slugId = normalizeRelationId(record.Slug).trim();
-      const slug = slugId ? (projectSlugMap[slugId] ?? "") : "";
+      const slug = relatedProject?.slug?.trim() ?? "";
       const href = slug ? `/design/${encodeURIComponent(slug)}` : undefined;
 
       return {
@@ -660,10 +652,11 @@ export default function HomePage() {
         year,
         imageSrc,
         imageAlt,
+        imageAspectClassName: fallback.imageAspectClassName,
         href,
       };
     },
-    [projectBlockMap, projectSlugMap],
+    [projectBlockMap],
   );
 
   const projectBlock1 = getProjectBlockDisplay(1, {
@@ -672,6 +665,7 @@ export default function HomePage() {
     year: "2024",
     imageSrc: "/2.webp",
     imageAlt: "Project Name",
+    imageAspectClassName: "aspect-[3/4]",
   });
   const projectBlock2 = getProjectBlockDisplay(2, {
     title: "Project Name",
@@ -679,6 +673,7 @@ export default function HomePage() {
     year: "2023",
     imageSrc: "/1.webp",
     imageAlt: "Project Name",
+    imageAspectClassName: "aspect-video",
   });
   const projectBlock3 = getProjectBlockDisplay(3, {
     title: "Project Name",
@@ -686,6 +681,7 @@ export default function HomePage() {
     year: "2022",
     imageSrc: "/3.webp",
     imageAlt: "Project Name",
+    imageAspectClassName: "aspect-[3/4]",
   });
   const projectBlock4 = getProjectBlockDisplay(4, {
     title: "Project Name",
@@ -693,6 +689,7 @@ export default function HomePage() {
     year: "2021",
     imageSrc: "/4.webp",
     imageAlt: "Project Name",
+    imageAspectClassName: "aspect-video",
   });
   const projectBlock5 = getProjectBlockDisplay(5, {
     title: "Project Name",
@@ -700,6 +697,7 @@ export default function HomePage() {
     year: "2020",
     imageSrc: "/5.webp",
     imageAlt: "Project Name",
+    imageAspectClassName: "aspect-video",
   });
 
   return (
@@ -850,6 +848,7 @@ export default function HomePage() {
                     year={projectBlock1.year}
                     imageSrc={projectBlock1.imageSrc}
                     imageAlt={projectBlock1.imageAlt}
+                    imageAspectClassName={projectBlock1.imageAspectClassName}
                     href={projectBlock1.href}
                     align="left"
                     className=""
@@ -882,6 +881,7 @@ export default function HomePage() {
                     year={projectBlock2.year}
                     imageSrc={projectBlock2.imageSrc}
                     imageAlt={projectBlock2.imageAlt}
+                    imageAspectClassName={projectBlock2.imageAspectClassName}
                     href={projectBlock2.href}
                     align="right"
                     className="mt-10 lg:mt-0"
@@ -914,6 +914,7 @@ export default function HomePage() {
                     year={projectBlock3.year}
                     imageSrc={projectBlock3.imageSrc}
                     imageAlt={projectBlock3.imageAlt}
+                    imageAspectClassName={projectBlock3.imageAspectClassName}
                     href={projectBlock3.href}
                     align="left"
                     className="lg:col-span-6 lg:col-start-3 mt-10 lg:mt-20"
@@ -946,6 +947,7 @@ export default function HomePage() {
                     year={projectBlock4.year}
                     imageSrc={projectBlock4.imageSrc}
                     imageAlt={projectBlock4.imageAlt}
+                    imageAspectClassName={projectBlock4.imageAspectClassName}
                     href={projectBlock4.href}
                     align="right"
                     className="lg:col-span-4 lg:col-start-9 mt-10 lg:mt-45"
@@ -978,6 +980,7 @@ export default function HomePage() {
                     year={projectBlock5.year}
                     imageSrc={projectBlock5.imageSrc}
                     imageAlt={projectBlock5.imageAlt}
+                    imageAspectClassName={projectBlock5.imageAspectClassName}
                     href={projectBlock5.href}
                     align="left"
                     className="lg:col-span-5 mt-10 lg:mt-20"

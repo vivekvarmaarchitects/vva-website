@@ -88,7 +88,7 @@ export default function AboutPage() {
       <div className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full">
         <FadeIn distance={24} duration={0.9} initialOpacity={0.15}>
           <div className="w-full mt-16">
-            <div className="relative h-[calc(100vh-4rem)] min-h-[480px] md:min-h-[640px] overflow-hidden">
+            {/* <div className="relative h-[calc(100vh-4rem)] min-h-[480px] md:min-h-[640px] overflow-hidden">
               <Image
                 src="/about/about_3.webp"
                 alt="Hero"
@@ -98,7 +98,7 @@ export default function AboutPage() {
                 priority
                 className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000"
               />
-            </div>
+            </div> */}
           </div>
         </FadeIn>
         <FadeIn distance={20} duration={0.8} initialOpacity={0.15} delay={0.05}>
@@ -218,7 +218,7 @@ export default function AboutPage() {
             >
               <div ref={tanayTextRef}>
                 <SplitText
-                  html="With more than three decades of practice, Vivek Varma has led the studio to the forefront of integrated spatial design in India. Our work spans residential, commercial, hospitality, cultural, and developer-led environments, consistently blurring the boundaries between interior space and architectural form to create cohesive, experiential narratives."
+                  html="I'm Tanay Verma — an architect and MBA graduate from Babson College, with experience spanning real estate, design, and proptech. My work covers a diverse range of project typologies, with a particular affinity for biophilic design — spaces that draw the outside in and feel intrinsically connected to the people who inhabit them."
                   className="font-display text-3xl font-light md:py-10"
                   delay={100}
                   duration={0.6}
@@ -241,7 +241,7 @@ export default function AboutPage() {
                   className=" font-display text-xl font-light mt-5"
                   dangerouslySetInnerHTML={{
                     __html:
-                      "Vivek Varma Architects is a multidisciplinary interior design and architecture practice driven by material sensitivity, spatial clarity, and a deep respect for human experience. Guided by founder Vivek Varma, the studio brings together design intelligence, cultural awareness, and thoughtful craftsmanship to shape environments that feel intentional, timeless, and quietly expressive.",
+                      "I believe meaningful architecture is timeless, shaped less by trend and more by a deep understanding of each client's life, rhythm, and aspirations. Every project, regardless of scale or scope, is approached as a personal narrative — translated into spaces that are considered, enduring, and uniquely their own.",
                   }}
                 />
               </div>
@@ -254,11 +254,11 @@ export default function AboutPage() {
             >
               <div ref={tanayImageRef}>
                 <Image
-                  src="/about/about_2.webp"
+                  src="/about/tanay_verma_portrait.webp"
                   alt="The creators"
                   width={800}
                   height={1200}
-                  className="w-full h-auto"
+                  className="w-full h-auto grayscale"
                 />
               </div>
             </FadeIn>
