@@ -1038,13 +1038,15 @@ export default function HomePage() {
 
                       {hasImage ? (
                         <div className="md:col-span-2">
-                          <Image
-                            src={item.imageUrl as string}
-                            alt={imageAlt}
-                            width={800}
-                            height={600}
-                            className="w-full h-auto rounded-md object-cover"
-                          />
+                          <div className="relative aspect-[386/162] w-full overflow-hidden rounded-md">
+                            <Image
+                              src={item.imageUrl as string}
+                              alt={imageAlt}
+                              fill
+                              sizes="(min-width: 768px) 33vw, 100vw"
+                              className="object-cover"
+                            />
+                          </div>
                         </div>
                       ) : null}
                     </div>
