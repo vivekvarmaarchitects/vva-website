@@ -141,7 +141,7 @@ const POCKETBASE_REFRESH_MS = (() => {
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 })();
-const POCKETBASE_CACHE_KEY = `pb:${POCKETBASE_COLLECTION}:${POCKETBASE_RECORD_ID}`;
+const POCKETBASE_CACHE_KEY = `pb:${POCKETBASE_COLLECTION}:${POCKETBASE_RECORD_ID}:v2`;
 const POCKETBASE_CACHE_TS_KEY = `${POCKETBASE_CACHE_KEY}:ts`;
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
@@ -336,6 +336,7 @@ export default function HomePage() {
   const [record, setRecord] = React.useState<HomepageRecord>(
     DEFAULT_HOMEPAGE_RECORD,
   );
+  const [apiRecord, setApiRecord] = React.useState<HomepageRecord | null>(null);
   const [heroIndex, setHeroIndex] = React.useState(0);
   const [projectBlocks, setProjectBlocks] = React.useState<
     HomepageProjectRecord[]
@@ -401,9 +402,10 @@ export default function HomePage() {
       try {
         const data = await fetchRecord();
         if (active && data) {
+          setApiRecord(data);
           const merged = { ...DEFAULT_HOMEPAGE_RECORD, ...data };
           setRecord(merged);
-          writeCache(merged);
+          writeCache(data);
         }
       } catch (error) {
         if (PB_DEBUG) {
@@ -421,6 +423,7 @@ export default function HomePage() {
 
     const cached = readCache();
     if (cached?.data) {
+      setApiRecord(cached.data);
       setRecord({ ...DEFAULT_HOMEPAGE_RECORD, ...cached.data });
     }
 
@@ -537,6 +540,10 @@ export default function HomePage() {
   const subHeroHtml = stripOuterTags(record.sub_hero_text, ["h2", "p"]);
   const introText = stripHtmlTags(record.intro);
   const heading1Html = stripOuterTags(record.heading_1, ["p"]);
+  const shouldShowHeading1 =
+    apiRecord === null
+      ? Boolean(heading1Html)
+      : Boolean(stripOuterTags(apiRecord.heading_1, ["p"]));
   const heading3Html = stripOuterTags(record.heading_3, ["p"]);
   const heading4Html = stripOuterTags(record.heading_4, ["p"]);
   const faqItems = React.useMemo(() => normalizeFaqItems(record.faq), [record]);
@@ -790,13 +797,15 @@ export default function HomePage() {
             </div>
           </FadeIn>
         </div>
-        <div className="w-full width-max py-10 text-center border-b dark:border-color-[#B3B4B4] common-heading dark:border-color-[#B3B4B4]">
-          <p dangerouslySetInnerHTML={{ __html: heading1Html }} />
-        </div>
+        {shouldShowHeading1 ? (
+          <div className="w-full width-max py-10 text-center border-b dark:border-color-[#B3B4B4] common-heading dark:border-color-[#B3B4B4]">
+            <p dangerouslySetInnerHTML={{ __html: heading1Html }} />
+          </div>
+        ) : null}
         <div className="width-max">
           <SplitText
             text={introText}
-            className="font-display text-2xl font-light py-10 lede-our-work-indent whitespace-pre-line"
+            className="m-0 py-10 font-display text-2xl font-light lede-our-work-indent whitespace-pre-line"
             delay={100}
             duration={0.6}
             ease="power3.out"
@@ -994,7 +1003,7 @@ export default function HomePage() {
         </main>
         <ResultsVisionSection headingHtml={heading4Html} />
 
-        <section className="w-full  py-24">
+        <section className="w-full py-12 md:py-16">
           <div className="width-max py-8">
             {/* Heading */}
             <h2 className="text-sm tracking-[0.35em] text-[#666766] dark:text-[#B3B4B4] dark:border-color-[#B3B4B4] uppercase mb-16">

@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type TouchEvent as ReactTouchEvent,
+} from "react";
 
 import SplitText from "@/components/animations/TextReveal";
 import Conversations from "@/components/sections/conversations-section";
@@ -41,6 +47,11 @@ type ImageMarqueeProps = {
 
 function ImageCarousel({ images, alts, nameLabel }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchDeltaXRef = useRef(0);
+
+  const isMobileViewport = () =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
 
   useEffect(() => {
     if (images.length <= 1) {
@@ -52,21 +63,79 @@ function ImageCarousel({ images, alts, nameLabel }: ImageCarouselProps) {
     return () => window.clearInterval(intervalId);
   }, [images.length]);
 
+  const goToIndex = (index: number) => {
+    setActiveIndex((index + images.length) % images.length);
+  };
+
+  const handleTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (!isMobileViewport() || images.length <= 1) return;
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchDeltaXRef.current = 0;
+  };
+
+  const handleTouchMove = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (!isMobileViewport() || touchStartXRef.current === null) return;
+    const currentX = event.touches[0]?.clientX ?? touchStartXRef.current;
+    touchDeltaXRef.current = currentX - touchStartXRef.current;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobileViewport() || touchStartXRef.current === null) return;
+
+    const swipeThreshold = 40;
+    if (touchDeltaXRef.current <= -swipeThreshold) {
+      setActiveIndex((prev) => (prev + 1) % images.length);
+    } else if (touchDeltaXRef.current >= swipeThreshold) {
+      setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+    }
+
+    touchStartXRef.current = null;
+    touchDeltaXRef.current = 0;
+  };
+
   return (
-    <div className="relative h-[480px] md:h-[640px] overflow-hidden md:my-16">
-      {images.map((src, index) => (
-        <Image
-          key={`${src}-${index}`}
-          src={src}
-          alt={alts[index] ?? nameLabel}
-          fill
-          sizes="100vw"
-          priority={index === 0}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-            index === activeIndex ? "opacity-100" : "opacity-0"
-          }`}
-        />
-      ))}
+    <div className="mt-10 md:my-16">
+      <div
+        className="relative h-[480px] md:h-[640px] overflow-hidden touch-pan-y md:touch-auto"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {images.map((src, index) => (
+          <Image
+            key={`${src}-${index}`}
+            src={src}
+            alt={alts[index] ?? nameLabel}
+            fill
+            sizes="100vw"
+            priority={index === 0}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+              index === activeIndex ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+      </div>
+      {images.length > 1 ? (
+        <div className="mt-3 flex items-center justify-center gap-1.5">
+          {images.map((_, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <button
+                key={`carousel-dot-${index}`}
+                type="button"
+                aria-label={`Go to image ${index + 1}`}
+                aria-pressed={isActive}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? "w-4 bg-black dark:bg-white"
+                    : "w-1.5 bg-black/25 dark:bg-white/30"
+                }`}
+                onClick={() => goToIndex(index)}
+              />
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -77,9 +146,90 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
   const groupRef = useRef<HTMLDivElement | null>(null);
   const animationRef = useRef<number | null>(null);
   const contentWidthRef = useRef(0);
+  const lastFrameTimeRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
+  const dragStartXRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
+  const suppressClickRef = useRef(false);
   const [cloneCount, setCloneCount] = useState(2);
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+  const [activeImageDimensions, setActiveImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const offsetRef = useRef(0);
+
+  const isMobileViewport = () =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
+
+  const normalizeOffset = () => {
+    const width = contentWidthRef.current;
+    if (width <= 0) return;
+
+    while (offsetRef.current <= -width) {
+      offsetRef.current += width;
+    }
+    while (offsetRef.current > 0) {
+      offsetRef.current -= width;
+    }
+  };
+
+  const applyOffset = () => {
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    }
+  };
+
+  const closeActiveImage = () => {
+    setActiveImageDimensions(null);
+    setActiveImageIndex(null);
+  };
+
+  const handleImageActivate = (index: number) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    setActiveImageDimensions(null);
+    setActiveImageIndex(index);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isMobileViewport()) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+
+    isDraggingRef.current = true;
+    pointerIdRef.current = event.pointerId;
+    dragStartXRef.current = event.clientX;
+    dragStartOffsetRef.current = offsetRef.current;
+    suppressClickRef.current = false;
+    containerRef.current?.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isMobileViewport()) return;
+    if (!isDraggingRef.current || pointerIdRef.current !== event.pointerId) return;
+
+    const deltaX = event.clientX - dragStartXRef.current;
+    if (Math.abs(deltaX) > 6) {
+      suppressClickRef.current = true;
+    }
+
+    offsetRef.current = dragStartOffsetRef.current + deltaX;
+    normalizeOffset();
+    applyOffset();
+  };
+
+  const handlePointerEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isMobileViewport()) return;
+    if (pointerIdRef.current !== event.pointerId) return;
+
+    isDraggingRef.current = false;
+    pointerIdRef.current = null;
+    lastFrameTimeRef.current = performance.now();
+    containerRef.current?.releasePointerCapture?.(event.pointerId);
+  };
 
   useEffect(() => {
     const track = trackRef.current;
@@ -98,6 +248,8 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
       if (contentWidthRef.current === 0) {
         offsetRef.current = 0;
       }
+      normalizeOffset();
+      applyOffset();
     };
 
     updateWidth();
@@ -107,26 +259,30 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
       resizeObserver.observe(container);
     }
 
-    let lastTime = performance.now();
     const speed = 40;
     const animate = (time: number) => {
+      const previousTime = lastFrameTimeRef.current ?? time;
+      const delta = (time - previousTime) / 1000;
+      lastFrameTimeRef.current = time;
+
+      if (isDraggingRef.current) {
+        applyOffset();
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       const width = contentWidthRef.current;
-      const delta = (time - lastTime) / 1000;
-      lastTime = time;
 
       if (width > 0) {
         offsetRef.current -= speed * delta;
-        if (offsetRef.current <= -width) {
-          offsetRef.current += width;
-        } else if (offsetRef.current > 0) {
-          offsetRef.current -= width;
-        }
+        normalizeOffset();
       }
 
-      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      applyOffset();
       animationRef.current = requestAnimationFrame(animate);
     };
 
+    lastFrameTimeRef.current = performance.now();
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
@@ -144,7 +300,7 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setActiveImageIndex(null);
+        closeActiveImage();
       }
     };
 
@@ -155,20 +311,52 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
     };
   }, [activeImageIndex]);
 
-  if (!images.length) {
-    return null;
-  }
-
   const activeImageSrc =
     activeImageIndex !== null ? images[activeImageIndex] : null;
   const activeImageAlt =
     activeImageIndex !== null
       ? (alts[activeImageIndex] ?? nameLabel)
       : nameLabel;
+  const activeImageWidth = activeImageDimensions?.width ?? 1600;
+  const activeImageHeight = activeImageDimensions?.height ?? 1200;
+
+  useEffect(() => {
+    if (!activeImageSrc) {
+      return;
+    }
+
+    let isCancelled = false;
+    const probeImage = new window.Image();
+
+    probeImage.onload = () => {
+      if (isCancelled) return;
+      setActiveImageDimensions({
+        width: probeImage.naturalWidth,
+        height: probeImage.naturalHeight,
+      });
+    };
+
+    probeImage.src = activeImageSrc;
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeImageSrc]);
+
+  if (!images.length) {
+    return null;
+  }
 
   return (
     <div className="my-16">
-      <div ref={containerRef} className="relative overflow-hidden">
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing md:touch-auto md:select-auto md:cursor-auto md:active:cursor-auto"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+      >
         <div
           ref={trackRef}
           className="flex w-max gap-2.5 will-change-transform"
@@ -184,14 +372,14 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
                 <button
                   key={`marquee-card-${groupIndex}-${src}-${index}`}
                   type="button"
-                  onClick={() => setActiveImageIndex(index)}
-                  className="relative aspect-3/4 w-[350px]  lg:w-[540px] flex-none overflow-hidden  bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
+                  onClick={() => handleImageActivate(index)}
+                  className="relative aspect-3/4 w-[82vw] md:w-[350px] lg:w-[540px] flex-none overflow-hidden bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
                 >
                   <Image
                     src={src}
                     alt={alts[index] ?? nameLabel}
                     fill
-                    sizes="(min-width: 1024px) 540px, (min-width: 640px) 350px, 85vw"
+                    sizes="(min-width: 1024px) 540px, (min-width: 768px) 350px, 82vw"
                     className="object-cover"
                   />
                 </button>
@@ -204,27 +392,28 @@ function ImageMarquee({ images, alts, nameLabel }: ImageMarqueeProps) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] p-6"
-          onClick={() => setActiveImageIndex(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px] sm:p-6"
+          onClick={closeActiveImage}
         >
           <div
-            className="relative h-[85vh] w-full max-w-6xl"
+            className="relative inline-block max-h-[85vh] max-w-full"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               aria-label="Close full screen"
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              onClick={() => setActiveImageIndex(null)}
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:right-4 md:top-4"
+              onClick={closeActiveImage}
             >
               X
             </button>
             <Image
               src={activeImageSrc}
               alt={activeImageAlt}
-              fill
+              width={activeImageWidth}
+              height={activeImageHeight}
               sizes="100vw"
-              className="object-contain"
+              className="block h-auto max-h-[85vh] w-auto max-w-full object-contain"
             />
           </div>
         </div>
@@ -267,7 +456,7 @@ export default function DesignProjectPage({
     "inline-flex items-center gap-3 border border-black px-4 py-2 text-sm font-medium uppercase tracking-wide opacity-40 dark:border-white";
 
   return (
-    <div className=" mt-32">
+    <div className="mt-16">
       <MouseTrail trailDurationMs={320} />
       <MouseTrail enabled={true} />;
       <div className="width-max">

@@ -19,13 +19,13 @@ export default function ProjectsPage() {
           <div className="relative h-[480px] md:h-[640px] overflow-hidden mt-10">
             <Image
               // key={`${src}-${index}`}
-              src="/design/design_7.webp"
+              src="/design/hero.webp"
               alt="Hero"
               fill
               sizes="100vw"
               quality={95}
               priority
-              className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000"
+              className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000 greyscale-0 opacity-100"
             />
             <div className="width-max">
               <SplitText
@@ -95,4 +95,3 @@ export default function ProjectsPage() {
     </div>
   );
 }
-

@@ -214,6 +214,7 @@ export default function AboutPage() {
               distance={20}
               duration={0.8}
               initialOpacity={0.18}
+              threshold={0.03}
               delay={0.05}
             >
               <div ref={tanayTextRef}>
@@ -230,8 +231,8 @@ export default function AboutPage() {
                   textAlign="left"
                   enableScrollTrigger={true}
                   scrollTriggerConfig={{
-                    start: "top 80%",
-                    end: "bottom 40%",
+                    start: "top 90%",
+                    end: "bottom 50%",
                     scrub: true,
                     once: false,
                     markers: false,

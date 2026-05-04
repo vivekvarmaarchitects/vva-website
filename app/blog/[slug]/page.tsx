@@ -96,10 +96,32 @@ const decodeHtmlEntities = (value: string) =>
     .replace(/&rsquo;|&lsquo;|&#8217;|&#8216;/gi, "'")
     .replace(/&rdquo;|&ldquo;|&#8221;|&#8220;/gi, '"');
 
+const BULLET_PREFIX_REGEX = /^(?:&bull;|&#8226;|&#x2022;|•|\*|-)(?:&nbsp;|\s)+/i;
+
 const stripHtml = (value: string) => {
   const withLineBreaks = value.replace(/<br\s*\/?>/gi, " ");
   const withoutTags = withLineBreaks.replace(/<[^>]*>/g, " ");
   return normalizeSpaces(decodeHtmlEntities(withoutTags));
+};
+
+const normalizeBlogBodyHtml = (body?: string | null) => {
+  if (!isNonEmptyString(body)) return "";
+
+  return body.replace(
+    /((?:<p\b[^>]*>\s*(?:&bull;|&#8226;|&#x2022;|•|\*|-)(?:&nbsp;|\s)+[\s\S]*?<\/p>\s*){1,})/gi,
+    (match) => {
+      const items = Array.from(match.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi))
+        .map(([, content]) => (content ?? "").trim())
+        .map((content) => content.replace(BULLET_PREFIX_REGEX, "").trim())
+        .filter(Boolean);
+
+      if (!items.length) {
+        return match;
+      }
+
+      return `<ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+    },
+  );
 };
 
 const trimDescription = (value?: string | null, maxLength = 160) => {
@@ -457,6 +479,7 @@ export default async function Page({ params }: PageProps) {
   const summaryText = post.summary ?? post.meta_description ?? "";
   const faqItems = normalizeFaqItems(post.faq);
   const wordCount = getWordCount(post.body);
+  const renderedBody = normalizeBlogBodyHtml(post.body);
   const blogJsonLd = buildBlogJsonLd(post, seo, wordCount);
   const showFaqSchema = faqItems.length >= 2;
 
@@ -509,11 +532,11 @@ export default async function Page({ params }: PageProps) {
         </div>
 
         {post.tags?.length ? (
-          <div className="flex flex-wrap items-center gap-2 pb-6">
+          <div className="mt-6 flex flex-wrap items-start gap-2.5 pb-8 md:mt-8 md:items-center md:gap-2 md:pb-6">
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 text-[10px] uppercase tracking-[0.2em] bg-black text-white dark:bg-white dark:text-black"
+                className="px-3 py-1.5 text-[10px] leading-tight uppercase tracking-[0.2em] bg-black text-white dark:bg-white dark:text-black"
               >
                 {tag}
               </span>
@@ -535,10 +558,10 @@ export default async function Page({ params }: PageProps) {
         </div>
       ) : null}
 
-      <div className="width-max md:my-16">
+      <div className="mt-6 width-max md:mt-0 md:my-16">
         <div
-          className="font-display text-base md:text-lg font-light leading-relaxed text-[#1E1E1E] dark:text-white space-y-6 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-light [&_h2]:tracking-wide [&_h2]:mt-10 [&_h2]:mb-4 [&_p]:text-base [&_p]:md:text-lg [&_p]:leading-relaxed [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-3 [&_li]:leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: post.body ?? "" }}
+          className="font-display text-base md:text-lg font-light leading-relaxed text-[#1E1E1E] dark:text-white space-y-6 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-light [&_h2]:tracking-wide [&_h2]:mt-10 [&_h2]:mb-4 [&_p]:text-base [&_p]:md:text-lg [&_p]:leading-relaxed [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-3 [&_li]:leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: renderedBody }}
         />
       </div>
 
