@@ -14,6 +14,7 @@ export default function ProjectsPage() {
     <div className="min-h-screen block bg-white dark:bg-black text-black dark:text-white transition-all duration-300  w-full">
       <MouseTrail trailDurationMs={320} />
       <MouseTrail enabled={true} />
+      <h1 className="sr-only">Selected Works</h1>
       <FadeIn distance={22} duration={0.85} initialOpacity={0.15}>
         <div className="w-full">
           <div className="relative h-[480px] md:h-[640px] overflow-hidden mt-10">
@@ -27,30 +28,6 @@ export default function ProjectsPage() {
               priority
               className="absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-1000 greyscale-0 opacity-100"
             />
-            <div className="width-max">
-              <SplitText
-                html="Selected Works"
-                className="flex font-sans text-4xl font-regular mt-32 text-black"
-                delay={100}
-                duration={0.6}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0.2, y: 0 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="-100px"
-                textAlign="left"
-                enableScrollTrigger={true}
-                tag="h1"
-                scrollTriggerConfig={{
-                  start: "top",
-                  end: "bottom 10%",
-                  scrub: true,
-                  once: true,
-                  markers: false,
-                }}
-              />
-            </div>
           </div>
         </div>
       </FadeIn>

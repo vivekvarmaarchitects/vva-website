@@ -141,10 +141,10 @@ export default function PublicationSection() {
   const displayPosts = useMemo(() => posts.slice(0, 3), [posts]);
 
   return (
-    <section className="w-full width-max py-8">
+    <section className="w-full width-max mt-12 py-8 md:mt-16">
       {/* Heading */}
       <h2 className="text-center text-sm tracking-[0.35em] text-[#666766] dark:text-[#B3B4B4] dark:border-color-[#B3B4B4] uppercase mb-16">
-        Our <span className="italic">Publications</span>
+        Our <span>Publications</span>
       </h2>
 
       {/* Card Grid */}

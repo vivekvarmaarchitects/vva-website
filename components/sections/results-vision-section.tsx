@@ -304,7 +304,7 @@ export default function ResultsVisionSection({
     <section className="bg-black text-white">
       <div className="width-max pb-16">
         <h2
-          className="text-center font-[#C3C3C3] common-heading py-10"
+          className="text-center font-[#C3C3C3] common-heading py-14 md:py-16"
           dangerouslySetInnerHTML={{ __html: headingContent }}
         />
 

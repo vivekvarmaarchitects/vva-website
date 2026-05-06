@@ -763,7 +763,7 @@ export default function HomePage() {
             delay={0.4}
           >
             <h2
-              className="font-display md:w-[50%] sub-hero-text"
+              className="font-sans md:w-[50%] sub-hero-text"
               dangerouslySetInnerHTML={{ __html: subHeroHtml }}
             />
           </FadeIn>
@@ -1019,14 +1019,14 @@ export default function HomePage() {
                 return (
                   <div
                     key={item.key}
-                    className={`border-t border-neutral-200 pt-12 sticky top-15 dark:bg-black bg-white ${
+                    className={`border-t border-neutral-200 px-6 py-12 sticky top-15 bg-white text-black dark:bg-black dark:text-white ${
                       index === specializations.length - 1
                         ? "border-b pb-20"
                         : ""
                     }`}
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-10 items-center">
-                      <div className="md:col-span-1 dark:text-white text-lg font-light ">
+                    <div className="grid grid-cols-1 gap-10 items-center md:grid-cols-6">
+                      <div className="text-lg font-light md:col-span-1">
                         {displayIndex}
                       </div>
 
@@ -1039,7 +1039,7 @@ export default function HomePage() {
                           </h3>
                         ) : null}
                         {item.description ? (
-                          <p className="dark:text-white leading-relaxed">
+                          <p className="leading-relaxed">
                             {item.description}
                           </p>
                         ) : null}

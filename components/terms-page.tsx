@@ -86,7 +86,7 @@ const terms = [
 ];
 
 export default function TermsPage() {
-  const [openIndex, setOpenIndex] = useState<number | null>(2);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleToggle = (index: number) => {
     setOpenIndex((current) => (current === index ? null : index));

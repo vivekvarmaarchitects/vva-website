@@ -89,7 +89,7 @@ const privacySections = [
 ];
 
 export default function PrivacyPage() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleToggle = (index: number) => {
     setOpenIndex((current) => (current === index ? null : index));

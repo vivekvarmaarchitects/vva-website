@@ -50,7 +50,7 @@ export default function ContactPage() {
                 enableScrollTrigger={true}
                 tag="h1"
                 scrollTriggerConfig={{
-                  start: "top 30%",
+                  start: "top 65%",
                   end: "bottom 10%",
                   scrub: true,
                   once: true,
