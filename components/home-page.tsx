@@ -805,7 +805,7 @@ export default function HomePage() {
         <div className="width-max">
           <SplitText
             text={introText}
-            className="m-0 py-10 font-display text-2xl font-light lede-our-work-indent whitespace-pre-line"
+            className="my-10 font-display text-2xl font-light lede-our-work-indent whitespace-pre-line"
             delay={100}
             duration={0.6}
             ease="power3.out"

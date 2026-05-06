@@ -219,7 +219,7 @@ export default function AboutPage() {
             >
               <div ref={tanayTextRef}>
                 <SplitText
-                  html="I'm Tanay Verma — an architect and MBA graduate from Babson College, with experience spanning real estate, design, and proptech. My work covers a diverse range of project typologies, with a particular affinity for biophilic design — spaces that draw the outside in and feel intrinsically connected to the people who inhabit them."
+                  html="I'm Tanay Verma an architect and MBA graduate from Babson College, with experience spanning real estate, design, and proptech. My work covers a diverse range of project typologies, with a particular affinity for biophilic design — spaces that draw the outside in and feel intrinsically connected to the people who inhabit them."
                   className="font-display text-3xl font-light md:py-10"
                   delay={100}
                   duration={0.6}
@@ -296,38 +296,70 @@ export default function AboutPage() {
                 }}
               />
 
+              <SplitText
+                html={`“THOUGHTS – PENCIL SKETCHS – WORKS INTO REALITY”`}
+                className="font-display text-2xl font-light py-10"
+                delay={100}
+                duration={0.6}
+                ease="power3.out"
+                splitType="words"
+                from={{ opacity: 0.2, y: 0 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                textAlign="left"
+                enableScrollTrigger={true}
+                scrollTriggerConfig={{
+                  start: "top 85%",
+                  end: "bottom 50%",
+                  scrub: true,
+                  once: false,
+                  markers: false,
+                }}
+              />
+
               {/* 3 columns */}
               <div className="mt-6 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
                 <div className="max-w-[360px]">
                   <p className="font-sams italic font-display text-2xl text-white">
                     01 / Curiosity
                   </p>
+
                   <p className="mt-4 text-sm leading-relaxed text-white">
-                    Interior architecture for residential, commercial, and
-                    hospitality environments with a focus on material honesty,
-                    proportion, and experiential flow.
+                    Our flexible approach to designs is modern but not borne by
+                    any preconceptions allowing us to create diverse teams with
+                    knowledge tailored to the challenge at hand. Our travel
+                    exposure gives us the inspiration to think creatively and
+                    adapt to the fast-changing world.
                   </p>
                 </div>
 
                 <div className="max-w-[360px]">
                   <p className="font-sams italic font-display text-2xl text-white">
-                    02 / Craft
+                    02 / Bespoke Design
                   </p>
                   <p className="mt-4 text-sm leading-relaxed text-white">
-                    Interior architecture for residential, commercial, and
-                    hospitality environments with a focus on material honesty,
-                    proportion, and experiential flow.
+                    Art exhibitions have always been our favourite place.
+                    spending days studying the art and history of architecture
+                    and our diverse and experienced range of insights gained
+                    across works, we transport our clients into the realm of
+                    experiencing and sourcing the right art and furniture for
+                    their homes, offices, and public spaces from bare walls down
+                    to the last accessory with intricate detailing.
                   </p>
                 </div>
 
                 <div className="max-w-[360px]">
                   <p className="font-sams italic font-display text-2xl text-white">
-                    03 / Perspective
+                    03 / The Firm
                   </p>
                   <p className="mt-4 text-sm leading-relaxed text-white">
-                    Interior architecture for residential, commercial, and
-                    hospitality environments with a focus on material honesty,
-                    proportion, and experiential flow.
+                    With over two decades of experience, Vivek Varma Architects
+                    is an integrated spatial design practice exploring the
+                    relationship between interior space and exterior form. Led
+                    by founder and principal designer Vivek Varma, the firm
+                    works across commercial, educational, cultural, residential,
+                    hospitality, institutional, and public spaces, with a
+                    portfolio recognised by numerous design excellence awards.
                   </p>
                 </div>
               </div>
