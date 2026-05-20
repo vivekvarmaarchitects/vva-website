@@ -174,6 +174,7 @@ export default function OurWorksSection() {
     {
       filter: "featured=true",
       perPage: String(PROJECTS_PER_PAGE),
+      sort: "-created",
     },
   ).toString()}`;
 
