@@ -18,6 +18,7 @@ type ProjectRecord = {
   Location?: string;
   Year?: string;
   ProjectType?: string;
+  Sector?: string;
 };
 
 type PBListResponse<T> = {
@@ -161,6 +162,7 @@ const ProjectCard = ({
 export default function OurWorksSection() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [active, setActive] = useState<string>(ALL_TAB);
+  const [activeSector, setActiveSector] = useState<string>(ALL_TAB);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -169,6 +171,7 @@ export default function OurWorksSection() {
     searchParams.get("scope") ??
     ""
   ).trim();
+  const sectorParam = searchParams.get("sector")?.trim() ?? "";
 
   const projectListUrl = `${normalizedBaseUrl}/api/collections/${POCKETBASE_COLLECTION}/records?${new URLSearchParams(
     {
@@ -241,6 +244,27 @@ export default function OurWorksSection() {
 
   const tabs = useMemo(() => buildTabs(projectTypes), [projectTypes]);
 
+  const sectorsForType = useMemo(() => {
+    if (active === ALL_TAB) {
+      return [];
+    }
+    const seen = new Set<string>();
+    const ordered: string[] = [];
+    projects.forEach((project) => {
+      if (project.ProjectType?.trim() !== active) {
+        return;
+      }
+      const sector = project.Sector?.trim();
+      if (sector && !seen.has(sector)) {
+        seen.add(sector);
+        ordered.push(sector);
+      }
+    });
+    return ordered;
+  }, [active, projects]);
+
+  const sectorTabs = useMemo(() => buildTabs(sectorsForType), [sectorsForType]);
+
   useEffect(() => {
     if (!projectTypeParam) {
       return;
@@ -264,14 +288,51 @@ export default function OurWorksSection() {
     }
   }, [active, projectTypes]);
 
+  useEffect(() => {
+    setActiveSector(ALL_TAB);
+  }, [active]);
+
+  useEffect(() => {
+    if (!sectorParam) {
+      return;
+    }
+    const match =
+      sectorsForType.find(
+        (sector) =>
+          toTabSlug(sector) === toTabSlug(sectorParam) ||
+          sector.toLowerCase() === sectorParam.toLowerCase(),
+      ) ?? null;
+    if (match) {
+      setActiveSector((prev) => (prev === match ? prev : match));
+    } else {
+      setActiveSector((prev) => (prev === ALL_TAB ? prev : ALL_TAB));
+    }
+  }, [sectorParam, sectorsForType]);
+
+  useEffect(() => {
+    if (activeSector !== ALL_TAB && !sectorsForType.includes(activeSector)) {
+      setActiveSector(ALL_TAB);
+    }
+  }, [activeSector, sectorsForType]);
+
   const activeTab = tabs.find((tab) => tab.key === active) ?? tabs[0];
+  const activeSectorTab =
+    sectorTabs.find((tab) => tab.key === activeSector) ?? sectorTabs[0];
 
   const filteredProjects = useMemo(() => {
-    if (active === ALL_TAB) {
-      return projects;
+    let result = projects;
+    if (active !== ALL_TAB) {
+      result = result.filter(
+        (project) => project.ProjectType?.trim() === active,
+      );
     }
-    return projects.filter((project) => project.ProjectType?.trim() === active);
-  }, [active, projects]);
+    if (activeSector !== ALL_TAB) {
+      result = result.filter(
+        (project) => project.Sector?.trim() === activeSector,
+      );
+    }
+    return result;
+  }, [active, activeSector, projects]);
 
   const activeDescription = PROJECT_TYPE_DESCRIPTIONS[active] ?? "";
 
@@ -307,6 +368,38 @@ export default function OurWorksSection() {
             );
           })}
         </div>
+
+        {active !== ALL_TAB && sectorTabs.length > 1 && (
+          <div
+            role="tablist"
+            aria-label="Sectors"
+            className="mt-3 inline-flex w-full flex-wrap items-center justify-center gap-2"
+          >
+            {sectorTabs.map((tab) => {
+              const isActive = tab.key === activeSector;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={activeSectorTab.panelId}
+                  id={tab.tabId}
+                  onClick={() => setActiveSector(tab.key)}
+                  className={[
+                    "min-w-28 px-3 py-0.5 text-xs font-medium uppercase transition duration-300",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white",
+                    isActive
+                      ? "bg-black text-white dark:bg-white dark:text-black"
+                      : "border border-black/40 bg-transparent text-black/70 hover:text-black dark:border-white/40 dark:text-white/70 dark:hover:text-white",
+                  ].join(" ")}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         <div className="mt-6 flex justify-center">
           <div className="min-h-24 max-w-3xl text-center text-base leading-relaxed text-black dark:text-white">
