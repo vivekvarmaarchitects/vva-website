@@ -17,6 +17,7 @@ type ProjectRecord = {
   arc_window?: boolean;
   Location?: string;
   Year?: string;
+  Date?: string;
   ProjectType?: string;
   Sector?: string;
 };
@@ -165,6 +166,7 @@ export default function OurWorksSection() {
   const [activeSector, setActiveSector] = useState<string>(ALL_TAB);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const searchParams = useSearchParams();
   const projectTypeParam = (
     searchParams.get("projectType") ??
@@ -331,8 +333,20 @@ export default function OurWorksSection() {
         (project) => project.Sector?.trim() === activeSector,
       );
     }
+    result = [...result].sort((a, b) => {
+      const aTime = a.Date ? new Date(a.Date).getTime() : null;
+      const bTime = b.Date ? new Date(b.Date).getTime() : null;
+      const aValid = typeof aTime === "number" && Number.isFinite(aTime);
+      const bValid = typeof bTime === "number" && Number.isFinite(bTime);
+      if (aValid && bValid) {
+        return sortOrder === "desc" ? bTime - aTime : aTime - bTime;
+      }
+      if (aValid && !bValid) return sortOrder === "desc" ? -1 : 1;
+      if (!aValid && bValid) return sortOrder === "desc" ? 1 : -1;
+      return 0;
+    });
     return result;
-  }, [active, activeSector, projects]);
+  }, [active, activeSector, projects, sortOrder]);
 
   const activeDescription = PROJECT_TYPE_DESCRIPTIONS[active] ?? "";
 
@@ -367,6 +381,15 @@ export default function OurWorksSection() {
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={() => setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))}
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium uppercase text-black/60 transition duration-300 hover:text-black dark:text-white/60 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+            aria-label={`Sort by year ${sortOrder === "desc" ? "descending" : "ascending"}`}
+          >
+            <span>Sort by Year</span>
+            <span aria-hidden="true">{sortOrder === "desc" ? "↓" : "↑"}</span>
+          </button>
         </div>
 
         {active !== ALL_TAB && sectorTabs.length > 1 && (
