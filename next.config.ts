@@ -83,6 +83,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_POCKETBASE_URL: pocketbaseUrl ?? "",
   },
   images: {
+    unoptimized: true,
     remotePatterns: pocketbaseUrl
       ? [
           {
