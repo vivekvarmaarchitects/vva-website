@@ -17,10 +17,10 @@ export default function ProjectsPage() {
       <h1 className="sr-only">Selected Works</h1>
       <FadeIn distance={22} duration={0.85} initialOpacity={0.15}>
         <div className="w-full">
-          <div className="relative h-[480px] md:h-[640px] overflow-hidden mt-10">
+          <div className="relative mt-16 h-[480px] overflow-hidden md:h-[640px]">
             <Image
               // key={`${src}-${index}`}
-              src="/design/hero.webp"
+              src="/design/hero_2.jpg"
               alt="Hero"
               fill
               sizes="100vw"
