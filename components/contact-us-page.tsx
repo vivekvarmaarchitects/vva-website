@@ -70,8 +70,8 @@ export default function ContactPage() {
             </div>
             <FadeIn className="max-w-md space-y-6">
               <div className="text-sm text-black/80 dark:text-white/80">
-                <p>t. +91 83800 80317</p>
-                <p>e. vivekvarma@gmail.com</p>
+                <p>t. +91 98679 81961</p>
+                <p>e. tanayverma@vivekvarmaarchitects.com</p>
               </div>
             </FadeIn>
           </div>
