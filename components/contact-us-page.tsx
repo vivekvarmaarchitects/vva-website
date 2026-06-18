@@ -72,6 +72,7 @@ export default function ContactPage() {
               <div className="text-sm text-black/80 dark:text-white/80">
                 <p>t. +91 98679 81961</p>
                 <p>e. tanayverma@vivekvarmaarchitects.com</p>
+                <p>e. vivek@vkvarch.net</p>
               </div>
             </FadeIn>
           </div>

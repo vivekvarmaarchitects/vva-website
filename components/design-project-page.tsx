@@ -59,7 +59,7 @@ function ImageCarousel({ images, alts, nameLabel }: ImageCarouselProps) {
     }
     const intervalId = window.setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
+    }, 3000);
     return () => window.clearInterval(intervalId);
   }, [images.length]);
 

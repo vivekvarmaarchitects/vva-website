@@ -89,8 +89,15 @@ const truncateSummary = (value: string, limit = 105) => {
   return `${clipped}....`;
 };
 
-export default function PublicationSection() {
+type PublicationSectionProps = {
+  hideWhenEmpty?: boolean;
+};
+
+export default function PublicationSection({
+  hideWhenEmpty = false,
+}: PublicationSectionProps) {
   const [posts, setPosts] = useState<BlogRecord[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const blogListUrl = `${normalizedBaseUrl}/api/collections/blog/records?${new URLSearchParams(
     {
@@ -117,6 +124,7 @@ export default function PublicationSection() {
           data.items?.filter((item) => item.published && item.homepage) ?? [];
         if (activeFetch) {
           setPosts(filteredPosts);
+          setHasLoaded(true);
         }
       } catch (err) {
         if (
@@ -126,6 +134,9 @@ export default function PublicationSection() {
           (err as { name?: string }).name === "AbortError"
         ) {
           return;
+        }
+        if (activeFetch) {
+          setHasLoaded(true);
         }
       }
     };
@@ -139,6 +150,10 @@ export default function PublicationSection() {
   }, [blogListUrl]);
 
   const displayPosts = useMemo(() => posts.slice(0, 3), [posts]);
+
+  if (hideWhenEmpty && (!hasLoaded || displayPosts.length === 0)) {
+    return null;
+  }
 
   return (
     <section className="w-full width-max mt-12 py-8 md:mt-16">

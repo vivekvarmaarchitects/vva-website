@@ -101,7 +101,7 @@ export function SiteHeader() {
               href="/design"
               className="text-black/80 hover:text-black dark:text-white/80 dark:hover:text-white transition-colors"
             >
-              Design
+              Works
             </Link>
             <Link
               href="/blog"
@@ -170,7 +170,7 @@ export function SiteHeader() {
             onClick={handleCloseMenu}
             className="border-b border-black py-6 transition-opacity hover:opacity-70 dark:border-white"
           >
-            Design
+            Works
           </Link>
           <Link
             href="/blog"

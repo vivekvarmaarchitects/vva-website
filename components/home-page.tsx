@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 // Animation components
@@ -35,22 +36,27 @@ type HomepageRecord = {
   specialization_1_description?: string;
   specialization_1_image?: string;
   specialization_1_image_alt?: string;
+  specialization_1_project_type?: string;
   specialization_2_title?: string;
   specialization_2_description?: string;
   specialization_2_image?: string;
   specialization_2_image_alt?: string;
+  specialization_2_project_type?: string;
   specialization_3_title?: string;
   specialization_3_description?: string;
   specialization_3_image?: string;
   specialization_3_image_alt?: string;
+  specialization_3_project_type?: string;
   specialization_4_title?: string;
   specialization_4_description?: string;
   specialization_4_image?: string;
   specialization_4_image_alt?: string;
+  specialization_4_project_type?: string;
   specialization_5_title?: string;
   specialization_5_description?: string;
   specialization_5_image?: string;
   specialization_5_image_alt?: string;
+  specialization_5_project_type?: string;
 };
 
 type PBListResponse<T> = {
@@ -115,14 +121,17 @@ const DEFAULT_HOMEPAGE_RECORD: HomepageRecord = {
   specialization_1_description:
     "Interior architecture for residential, commercial, and hospitality environments with a focus on material honesty, proportion, and experiential flow.",
   specialization_1_image: "/interior.webp",
+  specialization_1_project_type: "Interior",
   specialization_2_title: "Architecture",
   specialization_2_description:
     "Complementary architectural design grounded in contextual clarity.",
   specialization_2_image: "/Architecture.webp",
-  specialization_3_title: "Space Design",
+  specialization_2_project_type: "Architecture",
+  specialization_3_title: "Furniture Design",
   specialization_3_description:
-    "Spatial compositions that shape circulation, mood, and user experience.",
+    "Bespoke furniture and object-led design developed as an extension of our interior and architectural projects.",
   specialization_3_image: "/Space.webp",
+  specialization_3_project_type: "Furniture",
 };
 
 const POCKETBASE_BASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "";
@@ -527,7 +536,7 @@ export default function HomePage() {
     }
     const intervalId = window.setInterval(() => {
       setHeroIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
+    }, 3000);
     return () => window.clearInterval(intervalId);
   }, [heroImages.length]);
 
@@ -555,30 +564,35 @@ export default function HomePage() {
         description: record.specialization_1_description,
         image: record.specialization_1_image,
         imageAlt: record.specialization_1_image_alt,
+        projectType: record.specialization_1_project_type,
       },
       {
         title: record.specialization_2_title,
         description: record.specialization_2_description,
         image: record.specialization_2_image,
         imageAlt: record.specialization_2_image_alt,
+        projectType: record.specialization_2_project_type,
       },
       {
         title: record.specialization_3_title,
         description: record.specialization_3_description,
         image: record.specialization_3_image,
         imageAlt: record.specialization_3_image_alt,
+        projectType: record.specialization_3_project_type,
       },
       {
         title: record.specialization_4_title,
         description: record.specialization_4_description,
         image: record.specialization_4_image,
         imageAlt: record.specialization_4_image_alt,
+        projectType: record.specialization_4_project_type,
       },
       {
         title: record.specialization_5_title,
         description: record.specialization_5_description,
         image: record.specialization_5_image,
         imageAlt: record.specialization_5_image_alt,
+        projectType: record.specialization_5_project_type,
       },
     ];
 
@@ -588,6 +602,7 @@ export default function HomePage() {
         const description = item.description?.trim() ?? "";
         const imageUrl = resolveImageUrl(record, item.image);
         const imageAlt = item.imageAlt?.trim() ?? "";
+        const projectType = item.projectType?.trim() ?? "";
         const hasContent = Boolean(title || description || imageUrl);
         if (!hasContent) {
           return null;
@@ -598,6 +613,9 @@ export default function HomePage() {
           description,
           imageUrl,
           imageAlt,
+          href: projectType
+            ? `/design?projectType=${encodeURIComponent(projectType)}`
+            : undefined,
         };
       })
       .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -1025,40 +1043,89 @@ export default function HomePage() {
                         : ""
                     }`}
                   >
-                    <div className="grid grid-cols-1 gap-10 items-center md:grid-cols-6">
-                      <div className="text-lg font-light md:col-span-1">
-                        {displayIndex}
-                      </div>
-
-                      <div
-                        className={hasImage ? "md:col-span-3" : "md:col-span-5"}
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="group block rounded-sm transition-opacity hover:opacity-85 focus:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+                        aria-label={
+                          item.title
+                            ? `View ${item.title} projects`
+                            : "View specialization projects"
+                        }
                       >
-                        {item.title ? (
-                          <h3 className="text-xl font-semibold mb-2">
-                            {item.title}
-                          </h3>
-                        ) : null}
-                        {item.description ? (
-                          <p className="leading-relaxed">
-                            {item.description}
-                          </p>
+                        <div className="grid grid-cols-1 gap-10 items-center md:grid-cols-6">
+                          <div className="text-lg font-light md:col-span-1">
+                            {displayIndex}
+                          </div>
+
+                          <div
+                            className={
+                              hasImage ? "md:col-span-3" : "md:col-span-5"
+                            }
+                          >
+                            {item.title ? (
+                              <h3 className="mb-2 text-xl font-semibold underline-offset-4 transition-decoration group-hover:underline">
+                                {item.title}
+                              </h3>
+                            ) : null}
+                            {item.description ? (
+                              <p className="leading-relaxed">
+                                {item.description}
+                              </p>
+                            ) : null}
+                          </div>
+
+                          {hasImage ? (
+                            <div className="md:col-span-2">
+                              <div className="relative aspect-[386/162] w-full overflow-hidden rounded-md">
+                                <Image
+                                  src={item.imageUrl as string}
+                                  alt={imageAlt}
+                                  fill
+                                  sizes="(min-width: 768px) 33vw, 100vw"
+                                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                                />
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-10 items-center md:grid-cols-6">
+                        <div className="text-lg font-light md:col-span-1">
+                          {displayIndex}
+                        </div>
+
+                        <div
+                          className={hasImage ? "md:col-span-3" : "md:col-span-5"}
+                        >
+                          {item.title ? (
+                            <h3 className="text-xl font-semibold mb-2">
+                              {item.title}
+                            </h3>
+                          ) : null}
+                          {item.description ? (
+                            <p className="leading-relaxed">
+                              {item.description}
+                            </p>
+                          ) : null}
+                        </div>
+
+                        {hasImage ? (
+                          <div className="md:col-span-2">
+                            <div className="relative aspect-[386/162] w-full overflow-hidden rounded-md">
+                              <Image
+                                src={item.imageUrl as string}
+                                alt={imageAlt}
+                                fill
+                                sizes="(min-width: 768px) 33vw, 100vw"
+                                className="object-cover"
+                              />
+                            </div>
+                          </div>
                         ) : null}
                       </div>
-
-                      {hasImage ? (
-                        <div className="md:col-span-2">
-                          <div className="relative aspect-[386/162] w-full overflow-hidden rounded-md">
-                            <Image
-                              src={item.imageUrl as string}
-                              alt={imageAlt}
-                              fill
-                              sizes="(min-width: 768px) 33vw, 100vw"
-                              className="object-cover"
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
+                    )}
                   </div>
                 );
               })}
@@ -1087,7 +1154,7 @@ export default function HomePage() {
             </div>
           </section>
         ) : null}
-        <PublicationSection />
+        <PublicationSection hideWhenEmpty />
       </div>
     </main>
   );
